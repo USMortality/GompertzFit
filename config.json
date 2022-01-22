@@ -1,0 +1,7 @@
+{
+    "smoothOverride": {
+        "germany": 0.025,
+        "norway": 0.03,
+        "united_states": 0.035
+    }
+}
