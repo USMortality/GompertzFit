@@ -12,6 +12,10 @@
                 "<node_internals>/**"
             ],
             "program": "${workspaceFolder}/src/main.ts",
+            "args": [
+                "world",
+                "[\"germany\"]"
+            ],
             "preLaunchTask": "tsc: build - tsconfig.json",
             "outFiles": [
                 "${workspaceFolder}/dist/**/*.js"

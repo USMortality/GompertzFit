@@ -1,19 +1,21 @@
 import { getSmoothedArrayMulti } from 'gauss-window'
 import lowess from '@stdlib/stats-lowess'
 
-import { fillerArray, fillerDateArray, getNumberLength } from './common.js'
+import { fillerArray, fillerDateArray, getNumberLength, loadJson } from './common.js'
 import { Slice } from './slice.js'
 
 export type Row = {
     date: Date,
     cases: number,
-    positiveRate: number,
-    // deaths: number,
+    positiveRate: number
 }
 
 const SMOOTHING = 15
 
 export class Series {
+    private folder: string
+    private jurisdiction: string
+    private sliceConfigPath: string
     private config: object
     private smoothFactor: number
 
@@ -32,21 +34,20 @@ export class Series {
 
     constructor(
         CONFIG: object,
+        folder: string,
         jurisdiction: string,
-        rows: Row[]
     ) {
         this.config = CONFIG
         this.smoothFactor = this.getSmoothFactor(jurisdiction)
-        this.loadData(rows)
+        this.folder = folder
+        this.jurisdiction = jurisdiction
+        this.sliceConfigPath = `./out/${this.folder}/${this.jurisdiction}/slices.json`
     }
 
-    getSmoothFactor(country: string): number {
-        const override = this.config['smoothOverride'][country]
-        const result = override ? override : 1 / SMOOTHING
-        return result
-    }
+    async loadData(rows: Row[]): Promise<void> {
+        // const sliceConfig: object = await loadJson(this.sliceConfigPath)
+        //     .catch(e => { return undefined })
 
-    loadData(rows: Row[]): void {
         let i = 0
         rows.forEach(element => {
             this.t.push(i++)
@@ -60,6 +61,12 @@ export class Series {
 
         this.startPosition = 0
         this.endPosition = rows.length - 1
+    }
+
+    private getSmoothFactor(country: string): number {
+        const override = this.config['smoothOverride'][country]
+        const result = override ? override : 1 / SMOOTHING
+        return result
     }
 
     getLoess(t: number[], values: number[], smoothFactor: number): number[] {
@@ -187,6 +194,9 @@ export class Series {
     }
 
     findYMax(): number {
+        const yOverride = this.config['yOverride'][this.jurisdiction]
+        if (yOverride) return yOverride
+
         let result = 0
         this.getNewCasesAvg().forEach(element => {
             if (element > result) result = element

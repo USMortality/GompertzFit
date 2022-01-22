@@ -29,8 +29,9 @@ export function makeLines(
         }
     }
 
+    let sliceCount = 1 // Used to not show last slice end line.
     slices.forEach(slice => {
-        if (slice.end) { // End
+        if (sliceCount++ < slices.length && slice.end) { // End
             line.xMin = slice.end
             line.xMax = slice.end
             line.borderDash = [0, 0]
@@ -203,7 +204,7 @@ export async function makeChart(
                 },
                 y: {
                     min: 0,
-                    max: chartConfig.yMax,
+                    max: 400000, //chartConfig.yMax,
                     title: {
                         display: true, text: 'Cases',
                         font: {

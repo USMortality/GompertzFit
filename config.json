@@ -1,4 +1,7 @@
 {
+    "yOverride": {
+        "germany": 350000
+    },
     "smoothOverride": {
         "germany": 0.025,
         "norway": 0.03,

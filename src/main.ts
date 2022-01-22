@@ -47,11 +47,12 @@ async function scheduleWorkersForSlice(
 async function analyzeSeries(
     CONFIG: object,
     folder: string,
-    data: Map<string, Row[]>,
-    jurisdiction: string
+    jurisdiction: string,
+    data: Map<string, Row[]>
 ): Promise<Slice[]> {
     const rows = data.get(jurisdiction)
-    const series: Series = new Series(CONFIG, jurisdiction, rows)
+    const series: Series = new Series(CONFIG, folder, jurisdiction)
+    series.loadData(rows)
     series.analyze()
     series.analyzeSlices()
 
@@ -130,7 +131,7 @@ async function processJurisdiction(
     jurisdiction: string
 ): Promise<void> {
     return new Promise(async (resolve) => {
-        const slices = await analyzeSeries(CONFIG, folder, rows, jurisdiction)
+        const slices = await analyzeSeries(CONFIG, folder, jurisdiction, rows)
 
         // Process slices
         const startIndex = LAST_SLICE_ONLY ? slices.length - 1 : 0

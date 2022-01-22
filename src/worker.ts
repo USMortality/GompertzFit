@@ -107,7 +107,10 @@ async function main(): Promise<void> {
             `Failed to load data for jurisdiction: ${jobConfig.jurisdiction}.`
         )
 
-        const series: Series = new Series(CONFIG, jobConfig.jurisdiction, data)
+        const series: Series = new Series(
+            CONFIG, jobConfig.folder, jobConfig.jurisdiction
+        )
+        series.loadData(data)
         series.startPosition = slice.start
         series.endPosition = slice.end
         series.slices = slices
