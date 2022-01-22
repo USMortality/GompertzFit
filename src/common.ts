@@ -46,7 +46,7 @@ export function getNumberLength(val: number): number {
     return val.toString().length
 }
 
-export async function loadJson(filename: string): Promise<void> {
+export async function loadJson(filename: string): Promise<object> {
     return new Promise((resolve, reject) => {
         readFile(filename, { encoding: 'utf-8' }, (err, data) => {
             if (err || !data) reject(err)
@@ -56,9 +56,17 @@ export async function loadJson(filename: string): Promise<void> {
 }
 
 export async function loadData(filename: string): Promise<Map<string, Row[]>> {
-    return await csvtojson.default({ delimiter: ',' })
-        .fromFile(filename)
-        .then(async (datas: any) => processCsvRows(datas))
+    return new Promise(async (resolve, reject) => {
+        try {
+            resolve(await csvtojson
+                .default({ delimiter: ',' })
+                .fromFile(filename)
+                .then(async (datas: any) => processCsvRows(datas)))
+        } catch (e) {
+            console.log('Error loading file, did you run `npm run update`?')
+            reject(e)
+        }
+    })
 }
 
 function shouldProcess(data): boolean {

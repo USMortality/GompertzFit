@@ -12,11 +12,8 @@ import { Slice } from './slice.js'
 import { Series, Row } from './series.js'
 import { ChartConfig, makeChart, makeLines } from './chart.js'
 
-let CONFIG
-
 const ADDITIONAL_DAYS = 90
 const Y_SCALE_FACTOR = 2
-const SMOOTHING = 15
 const MAX_IMAGES = 1
 const LAST_SLICE_ONLY = true
 const N_PROCESS = Math.max(1, os.cpus().length - 1)
@@ -47,24 +44,14 @@ async function scheduleWorkersForSlice(
     })
 }
 
-async function getSmoothFactor(country: string):
-    Promise<number> {
-    const override = CONFIG.smoothOverride[country]
-    const result = override ? override : 1 / SMOOTHING
-    // console.log(`Using smooth factor: ${result}`)
-    return result
-}
-
 async function analyzeSeries(
-    folder: string, dataset: string, jurisdiction: string
+    CONFIG: object,
+    folder: string,
+    data: Map<string, Row[]>,
+    jurisdiction: string
 ): Promise<Slice[]> {
-    const rows: Map<string, Row[]> = await loadData(dataset)
-    const data: Row[] | undefined = rows.get(jurisdiction)
-
-    if (!data) throw new Error('Failed to load rows')
-
-    const smoothFactor: number = await getSmoothFactor(jurisdiction)
-    const series: Series = new Series(data, smoothFactor)
+    const rows = data.get(jurisdiction)
+    const series: Series = new Series(CONFIG, jurisdiction, rows)
     series.analyze()
     series.analyzeSlices()
 
@@ -135,13 +122,15 @@ async function startWorkers(client: RedisClientType): Promise<void> {
 }
 
 async function processJurisdiction(
+    CONFIG: object,
     client: RedisClientType,
     folder: string,
     dataset: string,
+    rows: Map<string, Row[]>,
     jurisdiction: string
 ): Promise<void> {
     return new Promise(async (resolve) => {
-        const slices = await analyzeSeries(folder, dataset, jurisdiction)
+        const slices = await analyzeSeries(CONFIG, folder, rows, jurisdiction)
 
         // Process slices
         const startIndex = LAST_SLICE_ONLY ? slices.length - 1 : 0
@@ -166,7 +155,7 @@ function getProgressbar(title: string, total: number): ProgressBar {
 }
 
 async function processJurisdictions(
-    client: RedisClientType, folder: string, dataset: string,
+    CONFIG: object, client: RedisClientType, folder: string, dataset: string,
     jurisdictionFilters: string[]
 ): Promise<void> {
     return new Promise(async (resolve) => {
@@ -177,7 +166,9 @@ async function processJurisdictions(
         for (const [jurisdiction, _data] of rows) {
             if (!jurisdictionFilters ||
                 jurisdictionFilters.indexOf(jurisdiction) > -1) {
-                await processJurisdiction(client, folder, dataset, jurisdiction)
+                await processJurisdiction(
+                    CONFIG, client, folder, dataset, rows, jurisdiction
+                )
                 bar.tick(1)
             }
         }
@@ -187,7 +178,9 @@ async function processJurisdictions(
         for await (const [jurisdiction, _data] of rows) {
             if (!jurisdictionFilters ||
                 jurisdictionFilters.indexOf(jurisdiction) > -1) {
-                execSync(`ffmpeg -hide_banner -loglevel error -r 30 -pattern_type glob -i './out/${folder}/${jurisdiction}/*.png' -c:v libx264 -vf "fps=30,format=yuv420p,scale=1200x670" ./out/${folder}/${jurisdiction}.mp4`)
+                const movie = `./out/${folder}/${jurisdiction}.mp4`
+                execSync(`rm -rf ${movie}`)
+                execSync(`ffmpeg -hide_banner -loglevel error -r 30 -pattern_type glob -i './out/${folder}/${jurisdiction}/*.png' -c:v libx264 -vf "fps=30,format=yuv420p,scale=1200x670" ${movie}`)
                 bar.tick(1)
             }
         }
@@ -202,11 +195,9 @@ function getFilters(): string[] | undefined {
 }
 
 async function main(): Promise<void> {
-    CONFIG = await loadJson('config.json')
+    const CONFIG: object = await loadJson('config.json')
 
     console.log(`Running multithreaded on ${N_PROCESS} cores!`)
-    console.log('Cleaning up...')
-    execSync(`rm -rf ./out/*`)
 
     const folder = process.argv[2]
     const jurisdictionFilters: string[] = getFilters()
@@ -219,12 +210,12 @@ async function main(): Promise<void> {
 
     if (!folder || folder === 'us') {
         console.log('Processing US states...')
-        await processJurisdictions(client, 'us', './data/us.csv',
+        await processJurisdictions(CONFIG, client, 'us', './data/us.csv',
             jurisdictionFilters)
     }
     if (!folder || folder === 'world') {
         console.log('Processing countries...')
-        await processJurisdictions(client, 'world', './data/world.csv',
+        await processJurisdictions(CONFIG, client, 'world', './data/world.csv',
             jurisdictionFilters)
     }
 

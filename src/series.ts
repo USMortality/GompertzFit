@@ -11,14 +11,15 @@ export type Row = {
     // deaths: number,
 }
 
+const SMOOTHING = 15
+
 export class Series {
-    private rows: Row[]
+    private config: object
     private smoothFactor: number
 
     private dates: Date[] = []
     private t: number[] = []
     private cases: number[] = []
-    private deaths: number[] = []
     private newCases: number[]
     private positiveRate: number[] = []
     private newCasesAvg7: number[]
@@ -29,31 +30,43 @@ export class Series {
     startPosition: number
     endPosition: number
 
-    constructor(rows: Row[], smoothFactor: number = 1 / 20) {
-        this.rows = rows
-        this.smoothFactor = smoothFactor
+    constructor(
+        CONFIG: object,
+        jurisdiction: string,
+        rows: Row[]
+    ) {
+        this.config = CONFIG
+        this.smoothFactor = this.getSmoothFactor(jurisdiction)
+        this.loadData(rows)
+    }
 
+    getSmoothFactor(country: string): number {
+        const override = this.config['smoothOverride'][country]
+        const result = override ? override : 1 / SMOOTHING
+        return result
+    }
+
+    loadData(rows: Row[]): void {
         let i = 0
-        this.rows.forEach(element => {
+        rows.forEach(element => {
             this.t.push(i++)
             this.dates.push(element.date)
             this.cases.push(element.cases)
             this.positiveRate.push(element.positiveRate)
-            // this.deaths.push(element.deaths)
         })
 
         this.newCases = this.dailyDiff(this.cases)
         this.newCasesAvg7 = this.calculateSevenDayAverage(this.getNewCases())
 
         this.startPosition = 0
-        this.endPosition = this.rows.length - 1
+        this.endPosition = rows.length - 1
     }
 
     getLoess(t: number[], values: number[], smoothFactor: number): number[] {
         return lowess(t, values, { 'f': smoothFactor }).y
     }
 
-    analyze(offset: number = 0): void {
+    analyze(): void {
         this.newCasesAvg7Smooth = this.getLoess(
             this.getTSliced(), this.getNewCasesSliced(), this.smoothFactor
         )

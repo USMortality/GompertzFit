@@ -3,7 +3,7 @@ import { createClient } from 'redis'
 import { ChartConfig, makeChart, makeLines } from './chart.js'
 import { Series, Row } from './series.js'
 import { Gompertz } from './gompertz.js'
-import { fillerArray, getNameFromKey, loadData, loadSlices, saveImage } from './common.js'
+import { fillerArray, getNameFromKey, loadData, loadJson, loadSlices, saveImage } from './common.js'
 import { Slice } from './slice.js'
 
 const ADDITIONAL_DAYS = 90
@@ -88,6 +88,8 @@ async function getSlices(folder: string, jurisdiction: string):
 }
 
 async function main(): Promise<void> {
+    const CONFIG: object = await loadJson('config.json')
+
     const client = createClient()
     await client.connect()
 
@@ -105,7 +107,7 @@ async function main(): Promise<void> {
             `Failed to load data for jurisdiction: ${jobConfig.jurisdiction}.`
         )
 
-        const series: Series = new Series(data)
+        const series: Series = new Series(CONFIG, jobConfig.jurisdiction, data)
         series.startPosition = slice.start
         series.endPosition = slice.end
         series.slices = slices
@@ -113,7 +115,7 @@ async function main(): Promise<void> {
 
         if (sliceLength < 7) {
             try {
-                series.analyze(slice.start)
+                series.analyze()
             } catch (e) {
                 console.log(jobConfig)
             }
