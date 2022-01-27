@@ -26,7 +26,7 @@ async function getImage(
         series.getDate(slice.start + day)
     )
     const chartConfig: ChartConfig = {
-        yMax: Math.round(series.findYMax() * Y_SCALE_FACTOR),
+        yMax: series.findYMax(),
         lines,
         additionalDays: ADDITIONAL_DAYS
     }

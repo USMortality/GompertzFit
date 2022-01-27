@@ -206,7 +206,7 @@ export class Series {
         const lenCalc = Math.pow(10, lenAbs - 1)
         const a = Math.ceil(result / lenCalc)
 
-        return a * Math.pow(10, lenAbs - 1)
+        return Math.round(a * Math.pow(10, lenAbs - 1)) * 2
     }
 
     getDate(index: number): Date {

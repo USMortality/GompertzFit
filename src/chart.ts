@@ -204,7 +204,7 @@ export async function makeChart(
                 },
                 y: {
                     min: 0,
-                    max: 400000, //chartConfig.yMax,
+                    max: chartConfig.yMax,
                     title: {
                         display: true, text: 'Cases',
                         font: {

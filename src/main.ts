@@ -13,7 +13,6 @@ import { Series, Row } from './series.js'
 import { ChartConfig, makeChart, makeLines } from './chart.js'
 
 const ADDITIONAL_DAYS = 90
-const Y_SCALE_FACTOR = 2
 const MAX_IMAGES = 1
 const LAST_SLICE_ONLY = true
 const N_PROCESS = Math.max(1, os.cpus().length - 1)
@@ -58,7 +57,7 @@ async function analyzeSeries(
 
     const lines: object[] = makeLines(series.slices)
     const chartConfig: ChartConfig = {
-        yMax: Math.round(series.findYMax() * Y_SCALE_FACTOR),
+        yMax: series.findYMax(),
         lines,
         additionalDays: ADDITIONAL_DAYS
     }
