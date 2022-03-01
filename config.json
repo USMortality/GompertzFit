@@ -1,7 +1,8 @@
 {
     "yOverride": {
         "germany": 150000,
-        "israel": 100000
+        "israel": 100000,
+        "new_zealand": 30000
     },
     "smoothOverride": {
         "germany": 0.025,
