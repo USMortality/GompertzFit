@@ -32,6 +32,7 @@
     "chart.js": "^3.7.0",
     "chartjs-node-canvas": "^4.1.6",
     "chartjs-plugin-annotation": "=1.1.0",
+    "commander": "^9.2.0",
     "csvtojson": "^2.0.10",
     "gauss-window": "^1.1.0",
     "node-fetch": "^3.2.0",

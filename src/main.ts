@@ -11,12 +11,14 @@ import { loadData, saveImage, getNameFromKey, loadJson } from './common.js'
 import { Slice } from './slice.js'
 import { Series, Row } from './series.js'
 import { ChartConfig, makeChart, makeLines } from './chart.js'
+import { Command } from 'commander';
 
 const ADDITIONAL_DAYS = 90
 const MAX_IMAGES = 1
 const LAST_SLICE_ONLY = true
 const N_PROCESS = Math.max(1, os.cpus().length - 1)
 
+const program = new Command();
 const myEmitter = new events.EventEmitter()
 
 async function scheduleWorkersForSlice(
@@ -155,7 +157,7 @@ function getProgressbar(title: string, total: number): ProgressBar {
 }
 
 async function processJurisdictions(
-    CONFIG: object, client: RedisClientType, folder: string, dataset: string,
+    CONFIG: any, client: RedisClientType, folder: string, dataset: string,
     jurisdictionFilters: string[]
 ): Promise<void> {
     return new Promise(async (resolve) => {
@@ -172,6 +174,7 @@ async function processJurisdictions(
                 bar.tick(1)
             }
         }
+        if (CONFIG.options.analyzeOnly) { resolve(); return }
 
         await startWorkers(client)
         bar = getProgressbar('Making videos', barSize)
@@ -189,31 +192,31 @@ async function processJurisdictions(
     })
 }
 
-function getFilters(): string[] | undefined {
-    const input = process.argv[3]
-    return input ? JSON.parse(input) : undefined
-}
-
 async function main(): Promise<void> {
-    const CONFIG: object = await loadJson('config.json')
+    const CONFIG: any = await loadJson('config.json')
+    program
+        .option('-d, --dataset <type>', 'choose dataset ["us", "world"]')
+        .option('-f, --filters <type>', 'filter by jurisdiction ["germany", "united_states"]')
+        .option('-a, --analyze-only', 'only analyze slices')
+    program.parse(process.argv);
+    CONFIG['options'] = program.opts();
 
     console.log(`Running multithreaded on ${N_PROCESS} cores!`)
 
-    const folder = process.argv[2]
-    const jurisdictionFilters: string[] = getFilters()
-    console.log(`Filter: ${folder}, ${jurisdictionFilters}`)
+    const jurisdictionFilters: string[] = CONFIG.options.filters
+    console.log(`Filter: ${CONFIG.options.dataset}, ${jurisdictionFilters}`)
 
     // Start redis
     const client: RedisClientType = createClient()
     await client.connect()
     await client.del('jobs')
 
-    if (!folder || folder === 'us') {
+    if (!CONFIG.options.dataset || CONFIG.options.dataset === 'us') {
         console.log('Processing US states...')
         await processJurisdictions(CONFIG, client, 'us', './data/us.csv',
             jurisdictionFilters)
     }
-    if (!folder || folder === 'world') {
+    if (!CONFIG.options.dataset || CONFIG.options.dataset === 'world') {
         console.log('Processing countries...')
         await processJurisdictions(CONFIG, client, 'world', './data/world.csv',
             jurisdictionFilters)
