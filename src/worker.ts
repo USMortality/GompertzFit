@@ -3,7 +3,9 @@ import { createClient } from 'redis'
 import { ChartConfig, makeChart, makeLines } from './chart.js'
 import { Series, Row } from './series.js'
 import { Gompertz } from './gompertz.js'
-import { fillerArray, getNameFromKey, loadData, loadJson, loadSlices, saveImage } from './common.js'
+import {
+    fillerArray, getNameFromKey, loadData, loadJson, loadSlices, saveImage
+} from './common.js'
 import { Slice } from './slice.js'
 
 const ADDITIONAL_DAYS = 90
@@ -44,27 +46,6 @@ type JobConfig = {
     runType: string
 }
 
-async function getJobConfig(client: any): Promise<JobConfig | undefined> {
-    return new Promise(async (resolve) => {
-        let config: JobConfig
-        const configJson = await client.rPop('jobs')
-        if (!process.argv[2]) { // Automatic
-            if (configJson === 'null') return undefined
-            config = JSON.parse(configJson)
-        } else { // Manual
-            config = {
-                folder: process.argv[2],
-                dataset: process.argv[3],
-                jurisdiction: process.argv[4],
-                sliceIndex: parseInt(process.argv[5], 10),
-                day: parseInt(process.argv[6], 10),
-                runType: 'manual'
-            }
-        }
-        resolve(config)
-    })
-}
-
 const datasetCache: Map<string, Map<string, Row[]>> = new Map()
 async function getRows(dataset: string): Promise<Map<string, Row[]>> {
     let result: Map<string, Row[]> = datasetCache.get(dataset)
@@ -87,13 +68,49 @@ async function getSlices(folder: string, jurisdiction: string):
     return result
 }
 
+class JobClient {
+    client: any
+
+    constructor() {
+        return (async (): Promise<JobClient> => {
+            this.client = createClient()
+            await this.client.connect()
+
+            return this
+        })() as unknown as JobClient
+    }
+
+    async tearDown(): Promise<void> {
+        await this.client.quit()
+    }
+
+    async getJob(): Promise<JobConfig | undefined> {
+        return new Promise(async (resolve) => {
+            let config: JobConfig
+            const configJson = await this.client.rPop('jobs')
+            if (!process.argv[2]) { // Automatic
+                if (configJson === 'null') return undefined
+                config = JSON.parse(configJson)
+            } else { // Manual
+                config = {
+                    folder: process.argv[2],
+                    dataset: process.argv[3],
+                    jurisdiction: process.argv[4],
+                    sliceIndex: parseInt(process.argv[5], 10),
+                    day: parseInt(process.argv[6], 10),
+                    runType: 'manual'
+                }
+            }
+            resolve(config)
+        })
+    }
+}
+
 async function main(): Promise<void> {
     const CONFIG: object = await loadJson('config.json')
+    const jobClient: JobClient = await new JobClient()
 
-    const client = createClient()
-    await client.connect()
-
-    let jobConfig: JobConfig | undefined = await getJobConfig(client)
+    let jobConfig: JobConfig | undefined = await jobClient.getJob()
     while (jobConfig) {
         console.log(`Processing job: ${JSON.stringify(jobConfig)}`)
         const rows = await getRows(jobConfig.dataset)
@@ -134,10 +151,10 @@ async function main(): Promise<void> {
         await saveImage(image, filename)
 
         jobConfig = jobConfig.runType === 'auto' ?
-            await getJobConfig(client) : undefined
+            await jobClient.getJob() : undefined
     }
 
-    await client.quit()
+    await jobClient.tearDown()
 }
 
 main()

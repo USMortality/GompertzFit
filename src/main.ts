@@ -11,15 +11,21 @@ import { loadData, saveImage, getNameFromKey, loadJson } from './common.js'
 import { Slice } from './slice.js'
 import { Series, Row } from './series.js'
 import { ChartConfig, makeChart, makeLines } from './chart.js'
-import { Command } from 'commander';
+import { Command } from 'commander'
 
 const ADDITIONAL_DAYS = 90
 const MAX_IMAGES = 1
 const LAST_SLICE_ONLY = true
 const N_PROCESS = Math.max(1, os.cpus().length - 1)
 
-const program = new Command();
+const program = new Command()
 const myEmitter = new events.EventEmitter()
+
+type Config = {
+    yOverride: object,
+    smoothOverride: object,
+    options: { analyzeOnly: boolean, dataset: string, filters: string }
+}
 
 async function scheduleWorkersForSlice(
     client: RedisClientType,
@@ -46,13 +52,13 @@ async function scheduleWorkersForSlice(
 }
 
 async function analyzeSeries(
-    CONFIG: object,
+    config: Config,
     folder: string,
     jurisdiction: string,
     data: Map<string, Row[]>
 ): Promise<Slice[]> {
     const rows = data.get(jurisdiction)
-    const series: Series = new Series(CONFIG, folder, jurisdiction)
+    const series: Series = new Series(config, folder, jurisdiction)
     series.loadData(rows)
     series.analyze()
     series.analyzeSlices()
@@ -124,7 +130,7 @@ async function startWorkers(client: RedisClientType): Promise<void> {
 }
 
 async function processJurisdiction(
-    CONFIG: object,
+    config: Config,
     client: RedisClientType,
     folder: string,
     dataset: string,
@@ -132,7 +138,7 @@ async function processJurisdiction(
     jurisdiction: string
 ): Promise<void> {
     return new Promise(async (resolve) => {
-        const slices = await analyzeSeries(CONFIG, folder, jurisdiction, rows)
+        const slices = await analyzeSeries(config, folder, jurisdiction, rows)
 
         // Process slices
         const startIndex = LAST_SLICE_ONLY ? slices.length - 1 : 0
@@ -157,7 +163,7 @@ function getProgressbar(title: string, total: number): ProgressBar {
 }
 
 async function processJurisdictions(
-    CONFIG: any, client: RedisClientType, folder: string, dataset: string,
+    config: Config, client: RedisClientType, folder: string, dataset: string,
     jurisdictionFilters: string[]
 ): Promise<void> {
     return new Promise(async (resolve) => {
@@ -169,12 +175,12 @@ async function processJurisdictions(
             if (!jurisdictionFilters ||
                 jurisdictionFilters.indexOf(jurisdiction) > -1) {
                 await processJurisdiction(
-                    CONFIG, client, folder, dataset, rows, jurisdiction
+                    config, client, folder, dataset, rows, jurisdiction
                 )
                 bar.tick(1)
             }
         }
-        if (CONFIG.options.analyzeOnly) { resolve(); return }
+        if (config.options.analyzeOnly) { resolve(); return }
 
         await startWorkers(client)
         bar = getProgressbar('Making videos', barSize)
@@ -193,32 +199,32 @@ async function processJurisdictions(
 }
 
 async function main(): Promise<void> {
-    const CONFIG: any = await loadJson('config.json')
+    const config: Config = await loadJson('config.json') as Config
     program
         .option('-d, --dataset <type>', 'choose dataset ["us", "world"]')
         .option('-f, --filters <type>', 'filter by jurisdiction ["germany", "united_states"]')
         .option('-a, --analyze-only', 'only analyze slices')
-    program.parse(process.argv);
-    CONFIG['options'] = program.opts();
+    program.parse(process.argv)
+    config.options = program.opts()
 
     console.log(`Running multithreaded on ${N_PROCESS} cores!`)
 
-    const jurisdictionFilters: string[] = CONFIG.options.filters
-    console.log(`Filter: ${CONFIG.options.dataset}, ${jurisdictionFilters}`)
+    const jurisdictionFilters: string[] = JSON.parse(config.options.filters)
+    console.log(`Filter: ${config.options.dataset}, ${jurisdictionFilters}`)
 
     // Start redis
     const client: RedisClientType = createClient()
     await client.connect()
     await client.del('jobs')
 
-    if (!CONFIG.options.dataset || CONFIG.options.dataset === 'us') {
+    if (!config.options.dataset || config.options.dataset === 'us') {
         console.log('Processing US states...')
-        await processJurisdictions(CONFIG, client, 'us', './data/us.csv',
+        await processJurisdictions(config, client, 'us', './data/us.csv',
             jurisdictionFilters)
     }
-    if (!CONFIG.options.dataset || CONFIG.options.dataset === 'world') {
+    if (!config.options.dataset || config.options.dataset === 'world') {
         console.log('Processing countries...')
-        await processJurisdictions(CONFIG, client, 'world', './data/world.csv',
+        await processJurisdictions(config, client, 'world', './data/world.csv',
             jurisdictionFilters)
     }
 
