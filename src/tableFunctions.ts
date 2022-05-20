@@ -18,11 +18,11 @@ export function sumNFunction(data: any[]): number {
     return sum as any
 }
 
-export function lowessFunction(data: any[]): number {
+export function loessFunction(data: any[]): number {
     if (data[0].length < 2) return 0
 
     const loess = getLoess(data[0], data[1])
-    return Math.round(loess[loess.length - 1])
+    return Math.round(loess[loess.length - 1] * 10) / 10
 }
 
 function getLoess(

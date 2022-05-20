@@ -21,7 +21,7 @@ export function makeLines(
         label: {
             rotation: false,
             position: 'start',
-            content: 'Peak',
+            content: [],
             font: {
                 size: 8
             },
@@ -46,8 +46,8 @@ export function makeLines(
             line.borderColor = 'rgb(255, 0, 0)'
             if (slice.peakDate) {
                 line.label.enabled = true
-                line.label.content = 'Peak: ' + slice.peakValue + ' (' +
-                    dateString(slice.peakDate) + ')'
+                line.label.content = ['Peak: ' + slice.peakValue,
+                dateString(slice.peakDate)]
             }
             lines.push(JSON.parse(JSON.stringify(line)))
         }
@@ -61,7 +61,7 @@ export function makeLines(
         line.borderColor = 'rgb(64, 64, 64)'
         line.label.enabled = true
         line.label.position = 'start'
-        line.label.content = 'Prediction as of: ' + dateString(trainingEndDate)
+        line.label.content = ['Prediction as of:', dateString(trainingEndDate)]
         lines.push(JSON.parse(JSON.stringify(line)))
     }
 
