@@ -1,12 +1,11 @@
-import { readFile } from 'fs'
 import { deepEqual } from 'assert'
 import { expect } from 'chai'
+import 'jest'
 import {
     addDays, fillerArray, fillerDateArray, getKey, getNameFromKey,
     getNumberLength, processCsvRows, capitalizeFirstLetters, dateString
 } from '../src/common.js'
 import { Row } from '../src/series.js'
-import 'jest'
 
 describe('common.ts', () => {
     describe('fillerArray', () => {

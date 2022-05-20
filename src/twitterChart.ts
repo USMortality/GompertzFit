@@ -4,14 +4,16 @@ import { promisify } from 'node:util'
 import { writeFile } from 'fs'
 
 export class TwitterChart {
-    data: any[]
-    constructor(data: any[]) {
+    title: string
+    data: [][]
+    constructor(title: string, data: any[]) {
+        this.title = title
         this.data = data
     }
 
-    async save(): Promise<void> {
+    async save(filename: string): Promise<void> {
         const buffer: Buffer = await this.makeChart()
-        await this.saveImage(buffer, './out/test.png')
+        await this.saveImage(buffer, filename)
     }
 
     async makeChart(): Promise<Buffer> {
@@ -50,7 +52,7 @@ export class TwitterChart {
                     title: {
                         display: true,
                         color: 'rgba(0, 0, 0, 100%)',
-                        text: `COVID-19 Cases `,
+                        text: this.title,
                         font: {
                             size: 18
                         }
@@ -102,7 +104,8 @@ export class TwitterChart {
                         min: 0,
                         // max: chartConfig.yMax,
                         title: {
-                            display: true, text: 'Cases',
+                            display: true,
+                            text: 'Cases',
                             font: {
                                 weight: '200',
                                 size: 11
