@@ -8,7 +8,7 @@ export class Table {
 
     constructor(
         columns: string[],
-        dataFunctions: ((data: any[]) => any)[]
+        dataFunctions: ((data: any[]) => any)[] = []
     ) {
         this.columns = columns
         this.dataFunctions = dataFunctions
@@ -22,8 +22,16 @@ export class Table {
         this.recalculateDataFunctions()
     }
 
-    insertRows(rows: any[][]): void {
-        for (const row of rows) this.insertRow(row)
+    insertRows(data: any[][]): void {
+        assert(data.length === this.columns.length)
+
+        for (let rowIndex = 0; rowIndex < data[0].length; rowIndex++) {
+            const result = []
+            for (let colIndex = 0; colIndex < data.length; colIndex++) {
+                result.push(data[colIndex][rowIndex])
+            }
+            this.insertRow(result)
+        }
     }
 
     recalculateDataFunctions(): void {

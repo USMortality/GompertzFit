@@ -9,11 +9,11 @@ export function sumFunction(data: any[]): number {
 export function sumNFunction(data: any[]): number {
     const n = 7
     const colIndex = 1
-    const start: number = data[colIndex].length < n ?
-        0 : data[colIndex].length - n
+    const columnData = data[colIndex]
+    const start: number = columnData.length < n ? 0 : columnData.length - n
     let sum = 0
-    for (let i = start; i < data[colIndex].length; i++) {
-        sum += data[colIndex][i]
+    for (let i = start; i < columnData.length; i++) {
+        sum += columnData[i]
     }
     return sum as any
 }
