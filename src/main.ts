@@ -1,7 +1,6 @@
+import { JobClient } from './jobClient.js'
 import { exec, execSync } from 'child_process'
 import * as events from 'events'
-import { createClient } from 'redis'
-type RedisClientType = ReturnType<typeof createClient>
 import { mkdir, writeFile } from 'fs'
 import { promisify } from 'node:util'
 import * as os from 'os'
@@ -28,7 +27,7 @@ type Config = {
 }
 
 async function scheduleWorkersForSlice(
-    client: RedisClientType,
+    client: JobClient,
     folder: string,
     dataset: string,
     jurisdiction: string,
@@ -45,7 +44,7 @@ async function scheduleWorkersForSlice(
         for (let i = slice.start; i <= slice.end; i++) {
             const jobIndex = i - slice.start
             config.day = jobIndex
-            await client.lPush('jobs', JSON.stringify(config))
+            await client.addJobConfig(config)
         }
         resolve()
     })
@@ -97,10 +96,10 @@ async function analyzeSeries(
     return series.slices
 }
 
-async function startWorkers(client: RedisClientType): Promise<void> {
+async function startWorkers(client: JobClient): Promise<void> {
     return new Promise(async (resolve) => {
         let finishedProcesses = 0
-        const jobs: number = await client.lLen('jobs')
+        const jobs: number = await client.getNumberOfJobs()
 
         const bar = getProgressbar('Processing jurisdictions', jobs)
         for (let i = 0; i < N_PROCESS; i++) {
@@ -131,7 +130,7 @@ async function startWorkers(client: RedisClientType): Promise<void> {
 
 async function processJurisdiction(
     config: Config,
-    client: RedisClientType,
+    client: JobClient,
     folder: string,
     dataset: string,
     rows: Map<string, Row[]>,
@@ -163,7 +162,10 @@ function getProgressbar(title: string, total: number): ProgressBar {
 }
 
 async function processJurisdictions(
-    config: Config, client: RedisClientType, folder: string, dataset: string,
+    config: Config,
+    client: JobClient,
+    folder: string,
+    dataset: string,
     jurisdictionFilters: string[]
 ): Promise<void> {
     return new Promise(async (resolve) => {
@@ -207,15 +209,11 @@ async function main(): Promise<void> {
     program.parse(process.argv)
     config.options = program.opts()
 
-    console.log(`Running multithreaded on ${N_PROCESS} cores!`)
-
     const jurisdictionFilters: string[] = JSON.parse(config.options.filters)
     console.log(`Filter: ${config.options.dataset}, ${jurisdictionFilters}`)
 
     // Start redis
-    const client: RedisClientType = createClient()
-    await client.connect()
-    await client.del('jobs')
+    const client = await new JobClient()
 
     if (!config.options.dataset || config.options.dataset === 'us') {
         console.log('Processing US states...')
@@ -228,8 +226,7 @@ async function main(): Promise<void> {
             jurisdictionFilters)
     }
 
-    // Stop redis
-    await client.quit()
+    await client.tearDown()
     console.log('Done.')
 }
 
