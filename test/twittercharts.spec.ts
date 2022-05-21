@@ -1,4 +1,4 @@
-import { Table } from './../src/table'
+import { Table } from '../src/table/table'
 import { TwitterChart } from './../src/twitterChart'
 import { expect } from 'chai'
 import 'jest'
@@ -15,8 +15,8 @@ describe('TwitterChart', () => {
             'Test Chart',
             table.data,
         )
-        await twitterchart.save('./out/test/test.png')
-        looksSame('./out/test/expected.png', './out/test/test.png',
+        await twitterchart.save('./test/out/test.png')
+        looksSame('./test/out/expected.png', './test/out/test.png',
             (_, { equal }) => {
                 expect(equal).to.equal(true)
             })

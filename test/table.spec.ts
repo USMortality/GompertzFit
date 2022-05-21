@@ -1,5 +1,5 @@
-import { TableFunctionType } from './../src/tableFunctionFactory'
-import { Table } from '../src/table.js'
+import { TableFunctionType } from '../src/table/tableFunctionFactory'
+import { Table } from '../src/table/table.js'
 import { expect } from 'chai'
 
 const rows = [
