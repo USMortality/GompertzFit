@@ -3,7 +3,7 @@ import lowess from '@stdlib/stats-lowess'
 
 export class LoessTableFunction extends BasicTableFunction {
     override calculate(data: any[][]): number {
-        const dataColumn = data[this.targetColumnIndex]
+        const dataColumn = this.sourceRow(data)
         if (dataColumn.length < 2) return 0
 
         const loess = this.getLoess(data[0], dataColumn)

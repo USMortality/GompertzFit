@@ -5,7 +5,7 @@ import { SumNTableFunction } from './sumNTableFunction'
 
 export type TableFunctionDefinition = {
     tableFunctionType: TableFunctionType,
-    targetColumnIndex: number
+    sourceColumnIndex: number
 }
 
 export enum TableFunctionType {
@@ -16,22 +16,26 @@ export enum TableFunctionType {
 
 export class TableFunctionFactory {
     static getFunction(
+        columnIndex: number,
         tableFunctionDefinition: TableFunctionDefinition
     ): TableFunction {
         switch (tableFunctionDefinition.tableFunctionType) {
             case TableFunctionType.Sum: {
                 return new SumTableFunction(
-                    tableFunctionDefinition.targetColumnIndex
+                    columnIndex,
+                    tableFunctionDefinition.sourceColumnIndex
                 )
             }
             case TableFunctionType.Sum7: {
                 return new SumNTableFunction(
-                    tableFunctionDefinition.targetColumnIndex, 7
+                    columnIndex,
+                    tableFunctionDefinition.sourceColumnIndex, 7
                 )
             }
             case TableFunctionType.Loess: {
                 return new LoessTableFunction(
-                    tableFunctionDefinition.targetColumnIndex
+                    columnIndex,
+                    tableFunctionDefinition.sourceColumnIndex
                 )
             }
         }

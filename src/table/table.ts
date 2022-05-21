@@ -40,11 +40,12 @@ export class Table {
     private recalculateDataFunctions(): void {
         let funIndex = 0
         for (const dataFunctionDefinition of this.dataFunctionDefinitions) {
-            const fun: TableFunction =
-                TableFunctionFactory.getFunction(dataFunctionDefinition)
-            this.data[this.columns.length + funIndex++].push(
-                fun.calculate(this.data)
+            const targetColumnIndex = this.columns.length + funIndex
+            const fun: TableFunction = TableFunctionFactory.getFunction(
+                targetColumnIndex, dataFunctionDefinition
             )
+            this.data[targetColumnIndex].push(fun.calculate(this.data))
+            funIndex++
         }
     }
 

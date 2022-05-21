@@ -14,7 +14,7 @@ describe('table', () => {
             [
                 {
                     tableFunctionType: TableFunctionType.Sum,
-                    targetColumnIndex: 1
+                    sourceColumnIndex: 1
                 }
             ]
         )
@@ -26,11 +26,11 @@ describe('table', () => {
             ['date', 'cases'], [
             {
                 tableFunctionType: TableFunctionType.Sum,
-                targetColumnIndex: 1
+                sourceColumnIndex: 1
             },
             {
                 tableFunctionType: TableFunctionType.Sum7,
-                targetColumnIndex: 1
+                sourceColumnIndex: 1
             }
         ]
         )
@@ -51,11 +51,11 @@ describe('table', () => {
             [
                 {
                     tableFunctionType: TableFunctionType.Sum,
-                    targetColumnIndex: 1
+                    sourceColumnIndex: 1
                 },
                 {
                     tableFunctionType: TableFunctionType.Sum7,
-                    targetColumnIndex: 1
+                    sourceColumnIndex: 1
                 }
             ]
         )
@@ -79,7 +79,7 @@ describe('table', () => {
             [
                 {
                     tableFunctionType: TableFunctionType.Sum,
-                    targetColumnIndex: 1
+                    sourceColumnIndex: 1
                 }
             ]
         )
@@ -94,7 +94,7 @@ describe('table', () => {
             [
                 {
                     tableFunctionType: TableFunctionType.Sum7,
-                    targetColumnIndex: 1
+                    sourceColumnIndex: 1
                 }
             ]
         )
@@ -109,15 +109,15 @@ describe('table', () => {
             [
                 {
                     tableFunctionType: TableFunctionType.Sum7,
-                    targetColumnIndex: 1
+                    sourceColumnIndex: 1
                 },
                 {
                     tableFunctionType: TableFunctionType.Loess,
-                    targetColumnIndex: 1
+                    sourceColumnIndex: 1
                 },
                 {
                     tableFunctionType: TableFunctionType.Loess,
-                    targetColumnIndex: 2
+                    sourceColumnIndex: 2
                 }
             ]
         )

@@ -3,8 +3,8 @@ import { BasicTableFunction } from './basicTableFunction'
 export class SumNTableFunction extends BasicTableFunction {
     private n: number
 
-    constructor(targetColumnIndex: number, n: number) {
-        super(targetColumnIndex)
+    constructor(columnIndex: number, sourceColumnIndex: number, n: number) {
+        super(columnIndex, sourceColumnIndex)
         this.n = n
     }
 
