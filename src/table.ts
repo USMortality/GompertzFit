@@ -1,51 +1,58 @@
+import { TableFunction } from './basicTableFunction'
 import { assert } from 'console'
+import { TableFunctionDefinition, TableFunctionFactory } from './tableFunctionFactory'
 
 export class Table {
-    columns: string[]
-    dataFunctions: ((data: any[]) => any)[]
-    data: any[] = []
-    dataCalculated: any[] = []
+    private columns: string[]
+    private dataFunctionDefinitions: TableFunctionDefinition[]
+    public data: any[] = []
 
     constructor(
         columns: string[],
-        dataFunctions: ((data: any[]) => any)[] = []
+        dataFunctionDefinitions: TableFunctionDefinition[] = []
     ) {
         this.columns = columns
-        this.dataFunctions = dataFunctions
+        this.dataFunctionDefinitions = dataFunctionDefinitions
         for (const _ of columns) this.data.push([])
-        for (const _ of dataFunctions) this.dataCalculated.push([])
+        for (const _ of dataFunctionDefinitions) this.data.push([])
     }
 
     insertRow(row: any[]): void {
-        assert(row.length === this.data.length)
+        assert(row.length === this.staticColumnLength())
         for (let i = 0; i < row.length; i++) this.data[i].push(row[i])
         this.recalculateDataFunctions()
     }
 
     insertRows(data: any[][]): void {
-        assert(data.length === this.columns.length)
+        assert(data.length === this.staticColumnLength())
 
         for (let rowIndex = 0; rowIndex < data[0].length; rowIndex++) {
             const result = []
-            for (let colIndex = 0; colIndex < data.length; colIndex++) {
-                result.push(data[colIndex][rowIndex])
+            for (const colIndex in data) {
+                if (Object.prototype.hasOwnProperty.call(data, colIndex)) {
+                    result.push(data[colIndex][rowIndex])
+                }
             }
             this.insertRow(result)
         }
     }
 
-    recalculateDataFunctions(): void {
+    private recalculateDataFunctions(): void {
         let funIndex = 0
-        for (const fun of this.dataFunctions) {
-            this.dataCalculated[funIndex++].push(fun(this.data))
+        for (const dataFunctionDefinition of this.dataFunctionDefinitions) {
+            const fun: TableFunction =
+                TableFunctionFactory.getFunction(dataFunctionDefinition)
+            this.data[this.columns.length + funIndex++].push(
+                fun.calculate(this.data)
+            )
         }
     }
 
-    getData(): any[] {
-        return this.data.concat(this.dataCalculated)
+    private staticColumnLength(): number {
+        return this.data.length - this.dataFunctionDefinitions.length
     }
 
     print(): void {
-        console.log(this.getData())
+        console.log(this.data)
     }
 }

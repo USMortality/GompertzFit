@@ -11,10 +11,9 @@ describe('TwitterChart', () => {
             [1, 2, 3, 4, 5, 6, 7],
             [10, 20, 15, 20, 23, 17, 25]
         ])
-        console.log(table.getData())
         const twitterchart = new TwitterChart(
             'Test Chart',
-            table.getData(),
+            table.data,
         )
         await twitterchart.save('./out/test/test.png')
         looksSame('./out/test/expected.png', './out/test/test.png',
