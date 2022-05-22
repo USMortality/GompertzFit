@@ -1,4 +1,6 @@
-import { TableFunctionType } from '../src/table/tableFunctionFactory'
+import {
+    LoessTableRowType, StaticTableRowType, SumNTableRowType, SumTableRowType
+} from '../src/table/tableRowType.js'
 import { Table } from '../src/table/table.js'
 import { expect } from 'chai'
 
@@ -10,12 +12,10 @@ const rows = [
 describe('table', () => {
     it('create new table', () => {
         const table = new Table(
-            ['date', 'cases'],
             [
-                {
-                    tableFunctionType: TableFunctionType.Sum,
-                    sourceColumnIndex: 1
-                }
+                new StaticTableRowType('t'),
+                new StaticTableRowType('Cases'),
+                new SumTableRowType('Cases Sum', 1)
             ]
         )
         expect(table.data.length).to.equal(3)
@@ -23,16 +23,12 @@ describe('table', () => {
 
     it('insert rows', () => {
         const table = new Table(
-            ['date', 'cases'], [
-            {
-                tableFunctionType: TableFunctionType.Sum,
-                sourceColumnIndex: 1
-            },
-            {
-                tableFunctionType: TableFunctionType.Sum7,
-                sourceColumnIndex: 1
-            }
-        ]
+            [
+                new StaticTableRowType('t'),
+                new StaticTableRowType('Cases'),
+                new SumTableRowType('Cases Sum', 1),
+                new SumNTableRowType('Cases Sum', 1, 7)
+            ]
         )
         table.insertRow([1, 0])
         table.insertRow([2, 2])
@@ -47,16 +43,11 @@ describe('table', () => {
 
     it('insertRows', () => {
         const table = new Table(
-            ['date', 'cases'],
             [
-                {
-                    tableFunctionType: TableFunctionType.Sum,
-                    sourceColumnIndex: 1
-                },
-                {
-                    tableFunctionType: TableFunctionType.Sum7,
-                    sourceColumnIndex: 1
-                }
+                new StaticTableRowType('t'),
+                new StaticTableRowType('Cases'),
+                new SumTableRowType('Cases Sum', 1),
+                new SumNTableRowType('Cases Sum', 1, 7)
             ]
         )
         table.insertRows([
@@ -75,12 +66,10 @@ describe('table', () => {
 
     it('sumFunction', () => {
         const table = new Table(
-            ['date', 'cases'],
             [
-                {
-                    tableFunctionType: TableFunctionType.Sum,
-                    sourceColumnIndex: 1
-                }
+                new StaticTableRowType('t'),
+                new StaticTableRowType('Cases'),
+                new SumTableRowType('Cases Sum', 1)
             ]
         )
         table.insertRows(rows)
@@ -90,12 +79,10 @@ describe('table', () => {
 
     it('sumNFunction', () => {
         const table = new Table(
-            ['date', 'cases'],
             [
-                {
-                    tableFunctionType: TableFunctionType.Sum7,
-                    sourceColumnIndex: 1
-                }
+                new StaticTableRowType('t'),
+                new StaticTableRowType('Cases'),
+                new SumNTableRowType('Cases Sum', 1, 7)
             ]
         )
         table.insertRows(rows)
@@ -105,20 +92,12 @@ describe('table', () => {
 
     it('loessFunction', () => {
         const table = new Table(
-            ['date', 'cases'],
             [
-                {
-                    tableFunctionType: TableFunctionType.Sum7,
-                    sourceColumnIndex: 1
-                },
-                {
-                    tableFunctionType: TableFunctionType.Loess,
-                    sourceColumnIndex: 1
-                },
-                {
-                    tableFunctionType: TableFunctionType.Loess,
-                    sourceColumnIndex: 2
-                }
+                new StaticTableRowType('t'),
+                new StaticTableRowType('Cases'),
+                new SumNTableRowType('Cases Sum', 1, 7),
+                new LoessTableRowType('Cases Avg', 1, 0),
+                new LoessTableRowType('Cases 7day Avg', 2, 0)
             ]
         )
         table.insertRows(rows)

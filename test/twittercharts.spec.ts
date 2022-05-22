@@ -3,10 +3,14 @@ import { TwitterChart } from './../src/twitterChart'
 import { expect } from 'chai'
 import 'jest'
 import looksSame from 'looks-same'
+import { StaticTableRowType } from '../src/table/tableRowType'
 
 describe('TwitterChart', () => {
     it('create chart', async () => {
-        const table = new Table(['date', 'cases'])
+        const table = new Table([
+            new StaticTableRowType('date'),
+            new StaticTableRowType('cases')
+        ])
         table.insertRows([
             [1, 2, 3, 4, 5, 6, 7],
             [10, 20, 15, 20, 23, 17, 25]

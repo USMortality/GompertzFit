@@ -1,20 +1,23 @@
-import { TableFunction } from './basicTableFunction'
+import { TableFunction } from './basicTableFunction.js'
 import { assert } from 'console'
-import { TableFunctionDefinition, TableFunctionFactory } from './tableFunctionFactory'
+import { TableFunctionFactory } from './tableFunctionFactory.js'
+import { FunctionalTableRowType, TableRowType } from './tableRowType.js'
 
 export class Table {
-    private columns: string[]
-    private dataFunctionDefinitions: TableFunctionDefinition[]
+    private columns: TableRowType[]
+    private dataFunctionDefinitions: FunctionalTableRowType[] = []
     public data: any[] = []
 
     constructor(
-        columns: string[],
-        dataFunctionDefinitions: TableFunctionDefinition[] = []
+        columns: TableRowType[]
     ) {
         this.columns = columns
-        this.dataFunctionDefinitions = dataFunctionDefinitions
-        for (const _ of columns) this.data.push([])
-        for (const _ of dataFunctionDefinitions) this.data.push([])
+        for (const column of columns) {
+            if (column instanceof FunctionalTableRowType) {
+                this.dataFunctionDefinitions.push(column)
+            }
+            this.data.push([])
+        }
     }
 
     insertRow(row: any[]): void {
@@ -40,7 +43,7 @@ export class Table {
     private recalculateDataFunctions(): void {
         let funIndex = 0
         for (const dataFunctionDefinition of this.dataFunctionDefinitions) {
-            const targetColumnIndex = this.columns.length + funIndex
+            const targetColumnIndex = this.staticColumnLength() + funIndex
             const fun: TableFunction = TableFunctionFactory.getFunction(
                 targetColumnIndex, dataFunctionDefinition
             )

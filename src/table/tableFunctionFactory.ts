@@ -1,43 +1,38 @@
-import { LoessTableFunction } from './loessTableFunction'
-import { TableFunction } from './basicTableFunction'
-import { SumTableFunction } from './sumTableFunction'
-import { SumNTableFunction } from './sumNTableFunction'
-
-export type TableFunctionDefinition = {
-    tableFunctionType: TableFunctionType,
-    sourceColumnIndex: number
-}
-
-export enum TableFunctionType {
-    Sum,
-    Sum7,
-    Loess
-}
+import { LoessTableFunction } from './loessTableFunction.js'
+import { TableFunction } from './basicTableFunction.js'
+import { SumTableFunction } from './sumTableFunction.js'
+import { SumNTableFunction } from './sumNTableFunction.js'
+import {
+    FunctionalTableRowType, LoessTableRowType, SumNTableRowType, SumTableRowType
+} from './tableRowType.js'
 
 export class TableFunctionFactory {
     static getFunction(
         columnIndex: number,
-        tableFunctionDefinition: TableFunctionDefinition
+        functionalTableRowType: FunctionalTableRowType
     ): TableFunction {
-        switch (tableFunctionDefinition.tableFunctionType) {
-            case TableFunctionType.Sum: {
+        switch (functionalTableRowType.constructor) {
+            case SumTableRowType:
                 return new SumTableFunction(
                     columnIndex,
-                    tableFunctionDefinition.sourceColumnIndex
+                    functionalTableRowType.sourceColumnIndex
                 )
-            }
-            case TableFunctionType.Sum7: {
+            case SumNTableRowType:
+                const sumNTableRowType =
+                    functionalTableRowType as SumNTableRowType
                 return new SumNTableFunction(
                     columnIndex,
-                    tableFunctionDefinition.sourceColumnIndex, 7
+                    sumNTableRowType.sourceColumnIndex,
+                    sumNTableRowType.n
                 )
-            }
-            case TableFunctionType.Loess: {
+            case LoessTableRowType:
+                const loessTableRowType
+                    = functionalTableRowType as LoessTableRowType
                 return new LoessTableFunction(
                     columnIndex,
-                    tableFunctionDefinition.sourceColumnIndex
+                    loessTableRowType.sourceColumnIndex,
+                    loessTableRowType.xColumnIndex
                 )
-            }
         }
     }
 }

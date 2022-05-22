@@ -1,16 +1,15 @@
+import { Table } from './table/table.js'
 import { JobClient } from './jobClient.js'
 import { exec, execSync } from 'child_process'
 import * as events from 'events'
-import { mkdir, writeFile } from 'fs'
-import { promisify } from 'node:util'
 import * as os from 'os'
 import ProgressBar from 'progress'
 
 import { loadData, saveImage, getNameFromKey, loadJson } from './common.js'
 import { Slice } from './slice.js'
 import { Series, Row } from './series.js'
-import { ChartConfig, makeChart, makeLines } from './chart.js'
 import { Command } from 'commander'
+import { LoessTableRowType, StaticTableRowType, SumNTableRowType } from './table/tableRowType.js'
 
 const ADDITIONAL_DAYS = 90
 const MAX_IMAGES = 1
@@ -57,41 +56,56 @@ async function analyzeSeries(
     data: Map<string, Row[]>
 ): Promise<Slice[]> {
     const rows = data.get(jurisdiction)
+    const table: Table = new Table(
+        [
+            new StaticTableRowType('t'),
+            new StaticTableRowType('date'),
+            new StaticTableRowType('cases'),
+            new SumNTableRowType('Cases 7 Day Avg', 2, 7),
+            new LoessTableRowType('Smoothed 7 Day Avg', 3, 0)
+        ]
+    )
+    let i = 0
+    rows.forEach(element => {
+        table.insertRow([i++, element.date, element.cases])
+    })
+    console.log(table.data)
+
     const series: Series = new Series(config, folder, jurisdiction)
-    series.loadData(rows)
-    series.analyze()
-    series.analyzeSlices()
+    // series.loadData(rows)
+    // series.analyze()
+    // series.analyzeSlices()
 
-    const lines: object[] = makeLines(series.slices)
-    const chartConfig: ChartConfig = {
-        yMax: series.findYMax(),
-        lines,
-        additionalDays: ADDITIONAL_DAYS
-    }
-    const image = await makeChart(
-        series, getNameFromKey(jurisdiction), chartConfig
-    )
+    // const lines: object[] = makeLines(series.slices)
+    // const chartConfig: ChartConfig = {
+    //     yMax: series.findYMax(),
+    //     lines,
+    //     additionalDays: ADDITIONAL_DAYS
+    // }
+    // const image = await makeChart(
+    //     series, getNameFromKey(jurisdiction), chartConfig
+    // )
 
-    // Create folder
-    const mkdirAsync = promisify(mkdir)
-    await mkdirAsync(`./out/${folder}`, { recursive: true })
-    await mkdirAsync(`./out/${folder}/${jurisdiction}`, { recursive: true })
+    // // Create folder
+    // const mkdirAsync = promisify(mkdir)
+    // await mkdirAsync(`./out/${folder}`, { recursive: true })
+    // await mkdirAsync(`./out/${folder}/${jurisdiction}`, { recursive: true })
 
-    // Make 30 images to create a longer impression to start with.
-    for (let i = 0; i < MAX_IMAGES; i++) await saveImage(image, `./out/${folder}/${jurisdiction}/0_${i}.png`)
+    // // Make 30 images to create a longer impression to start with.
+    // for (let i = 0; i < MAX_IMAGES; i++) await saveImage(image, `./out/${folder}/${jurisdiction}/0_${i}.png`)
 
-    await writeFile(`./out/${folder}/${jurisdiction}/slices.json`,
-        JSON.stringify(
-            series.slices.map((obj) => {
-                return {
-                    start: obj.start,
-                    end: obj.end,
-                }
-            }),
-            null, 2
-        ),
-        err => { if (err) console.log(err) }
-    )
+    // await writeFile(`./out/${folder}/${jurisdiction}/slices.json`,
+    //     JSON.stringify(
+    //         series.slices.map((obj) => {
+    //             return {
+    //                 start: obj.start,
+    //                 end: obj.end,
+    //             }
+    //         }),
+    //         null, 2
+    //     ),
+    //     err => { if (err) console.log(err) }
+    // )
 
     return series.slices
 }

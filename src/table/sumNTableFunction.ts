@@ -1,4 +1,4 @@
-import { BasicTableFunction } from './basicTableFunction'
+import { BasicTableFunction } from './basicTableFunction.js'
 
 export class SumNTableFunction extends BasicTableFunction {
     private n: number

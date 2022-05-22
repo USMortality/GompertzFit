@@ -45,15 +45,11 @@ export class Series {
     }
 
     async loadData(rows: Row[]): Promise<void> {
-        // const sliceConfig: object = await loadJson(this.sliceConfigPath)
-        //     .catch(e => { return undefined })
-
         let i = 0
         rows.forEach(element => {
             this.t.push(i++)
             this.dates.push(element.date)
             this.cases.push(element.cases)
-            this.positiveRate.push(element.positiveRate)
         })
 
         this.newCases = this.dailyDiff(this.cases)

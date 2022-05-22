@@ -1,12 +1,22 @@
-import { BasicTableFunction } from './basicTableFunction'
+import { BasicTableFunction } from './basicTableFunction.js'
 import lowess from '@stdlib/stats-lowess'
 
 export class LoessTableFunction extends BasicTableFunction {
+    xColumnIndex: number
+
+    constructor(
+        columnIndex: number,
+        sourceColumnIndex: number,
+        xColumnIndex: number) {
+        super(columnIndex, sourceColumnIndex)
+        this.xColumnIndex = xColumnIndex
+    }
+
     override calculate(data: any[][]): number {
         const dataColumn = this.sourceRow(data)
         if (dataColumn.length < 2) return 0
 
-        const loess = this.getLoess(data[0], dataColumn)
+        const loess = this.getLoess(data[this.xColumnIndex], dataColumn)
         return Math.round(loess[loess.length - 1] * 10) / 10
     }
 
