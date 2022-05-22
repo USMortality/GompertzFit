@@ -5,7 +5,7 @@ import * as events from 'events'
 import * as os from 'os'
 import ProgressBar from 'progress'
 
-import { loadData, saveImage, getNameFromKey, loadJson } from './common.js'
+import { loadData, saveImage, getNameFromKey, loadJson, zeroPad } from './common.js'
 import { Slice } from './slice.js'
 import { Series, Row } from './series.js'
 import { Command } from 'commander'
@@ -16,7 +16,7 @@ import {
     LoessTableRowType,
     StaticTableRowType
 } from './table/tableRowType.js'
-import { TwitterChart } from './twitterChart.js'
+import { TwitterChart, TwitterChartSeriesAxisType, TwitterChartSeriesConfigType } from './twitterChart.js'
 
 const ADDITIONAL_DAYS = 90
 const MAX_IMAGES = 1
@@ -67,7 +67,7 @@ async function analyzeSeries(
         [
             new StaticTableRowType('Date'),
             new StaticTableRowType('Cumulative Cases'),
-            new AutoIncrementTableRowType('t', 0),
+            new AutoIncrementTableRowType('Day', 0),
             new DiffTableRowType('Daily Cases', 1),
             new AvgNTableRowType('Cases (7d AVG)', 3, 7),
             new LoessTableRowType('Cases (7d AVG, smooth)', 4, 2)
@@ -77,11 +77,43 @@ async function analyzeSeries(
     for (const row of rows) {
         table.insertRow([row.date, row.cases])
         const chart = new TwitterChart(
-            `COVID-19 Cases [${jurisdiction}]`,
-            [table.data[2], table.data[3], table.data[4], table.data[5]]
+            `COVID-19 Cases [${getNameFromKey(jurisdiction)}]`,
+            'Source: OWID; Created by @USMortality',
+            'Day',
+            'COVID-19 Cases',
+            [
+                {
+                    axis: TwitterChartSeriesAxisType.x,
+                    type: TwitterChartSeriesConfigType.dot,
+                    label: table.columnTitles[2],
+                    color: [0, 0, 0],
+                    data: table.data[2]
+                },
+                {
+                    axis: TwitterChartSeriesAxisType.y,
+                    type: TwitterChartSeriesConfigType.line,
+                    label: table.columnTitles[4],
+                    color: [200, 0, 0],
+                    data: table.data[4]
+                },
+                {
+                    axis: TwitterChartSeriesAxisType.y,
+                    type: TwitterChartSeriesConfigType.dot,
+                    label: table.columnTitles[3],
+                    color: [0, 0, 200],
+                    data: table.data[3]
+                },
+                // {
+                //     axis: TwitterChartSeriesAxisType.y,
+                //     type: TwitterChartSeriesConfigType.line,
+                //     label: table.columnTitles[5],
+                //     color: [0, 0, 0],
+                //     data: table.data[5]
+                // }
+            ]
         )
         const lastT = table.data[2][table.data[2].length - 1]
-        await chart.save(`./out/test/${lastT}.png`)
+        await chart.save(`./out/test/${jurisdiction}/${zeroPad(lastT, 3)}.png`)
     }
 
     // console.log(JSON.stringify(table.data, null, 2))

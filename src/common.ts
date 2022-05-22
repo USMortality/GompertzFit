@@ -133,3 +133,7 @@ export async function download(urlString: string, file: string): Promise<void> {
 export function dateString(date: Date): string {
     return date.toLocaleDateString('en-US', { timeZone: 'UTC' })
 }
+
+export function zeroPad(num, places): string {
+    return String(num).padStart(places, '0')
+}
