@@ -4,17 +4,19 @@ import { TableFunctionFactory } from './tableFunctionFactory.js'
 import { FunctionalTableRowType, TableRowType } from './tableRowType.js'
 
 export class Table {
-    private columns: TableRowType[]
+    columnTitles: string[] = []
+    private tableRowTypes: TableRowType[] = []
     private dataFunctionDefinitions: FunctionalTableRowType[] = []
     public data: any[] = []
 
     constructor(
-        columns: TableRowType[]
+        tableRowTypes: TableRowType[]
     ) {
-        this.columns = columns
-        for (const column of columns) {
-            if (column instanceof FunctionalTableRowType) {
-                this.dataFunctionDefinitions.push(column)
+        for (const rowType of tableRowTypes) {
+            this.tableRowTypes.push(rowType)
+            this.columnTitles.push(rowType.title)
+            if (rowType instanceof FunctionalTableRowType) {
+                this.dataFunctionDefinitions.push(rowType)
             }
             this.data.push([])
         }

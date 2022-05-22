@@ -74,15 +74,16 @@ async function analyzeSeries(
         ]
     )
 
-    rows.forEach(async (element) => {
-        table.insertRow([element.date, element.cases])
+    for (const row of rows) {
+        table.insertRow([row.date, row.cases])
         const chart = new TwitterChart(
             `COVID-19 Cases [${jurisdiction}]`,
-            table.data
+            [table.data[2], table.data[3], table.data[4], table.data[5]]
         )
         const lastT = table.data[2][table.data[2].length - 1]
         await chart.save(`./out/test/${lastT}.png`)
-    })
+    }
+
     // console.log(JSON.stringify(table.data, null, 2))
 
     const series: Series = new Series(config, folder, jurisdiction)

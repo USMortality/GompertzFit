@@ -3,17 +3,62 @@ import { ChartJSNodeCanvas } from 'chartjs-node-canvas'
 import { promisify } from 'node:util'
 import { writeFile } from 'fs'
 
+export enum TwitterChartSeriesAxisType { x, y }
+export enum TwitterChartSeriesConfigType { dot, line }
+export type TwitterChartSeries = {
+    axis: TwitterChartSeriesAxisType,
+    type: TwitterChartSeriesConfigType,
+    label: string,
+    color: number[],
+    data: any[]
+}
+
 export class TwitterChart {
     title: string
-    data: [][]
-    constructor(title: string, data: any[]) {
+    subtitle: string
+    xTitle: string
+    yTitle: string
+    data: TwitterChartSeries[]
+
+    constructor(
+        title: string,
+        subtitle: string,
+        xTitle: string,
+        yTitle: string,
+        data: TwitterChartSeries[]
+    ) {
         this.title = title
+        this.subtitle = subtitle
+        this.xTitle = xTitle
+        this.yTitle = yTitle
         this.data = data
     }
 
     async save(filename: string): Promise<void> {
         const buffer: Buffer = await this.makeChart()
         await this.saveImage(buffer, filename)
+    }
+
+    makeDataSet(): any[] {
+        const datasets: any[] = []
+        for (const data of this.data) {
+            if (data.axis === TwitterChartSeriesAxisType.x) continue
+            datasets.push({
+                label: data.label,
+                data: data.data,
+                borderColor: `rgba(${data.color[0]}, ${data.color[1]},` +
+                    ` ${data.color[2]}, 100%)`,
+                backgroundColor: `rgba(${data.color[0]}, ${data.color[1]},` +
+                    ` ${data.color[2]}, 100%)`,
+                fill: false,
+                borderWidth: data.type === TwitterChartSeriesConfigType.dot ?
+                    0 : 2,
+                pointRadius: data.type === TwitterChartSeriesConfigType.dot ?
+                    2.5 : 0,
+                tension: 0.4,
+            })
+        }
+        return datasets
     }
 
     async makeChart(): Promise<Buffer> {
@@ -26,21 +71,11 @@ export class TwitterChart {
             }
         })
 
-        const datasets = []
-        datasets.push({
-            label: 'Cases',
-            data: this.data[1],
-            borderColor: 'rgba(255, 71, 155, 100%)',
-            fill: false,
-            borderWidth: 2,
-            pointRadius: 0,
-            tension: 0.4,
-        })
         const configuration: ChartConfiguration = {
             type: 'line',
             data: {
-                datasets,
-                labels: this.data[0]
+                datasets: this.makeDataSet(),
+                labels: this.data[0].data
             },
             options: {
                 responsive: true,
@@ -55,6 +90,15 @@ export class TwitterChart {
                         text: this.title,
                         font: {
                             size: 18
+                        }
+                    },
+                    subtitle: {
+                        display: true,
+                        color: 'rgba(120, 120, 120, 100%)',
+                        text: this.subtitle,
+                        font: {
+                            weight: '200',
+                            size: 11
                         }
                     },
                     legend: {
@@ -77,7 +121,7 @@ export class TwitterChart {
                         },
                         title: {
                             display: true,
-                            text: 'Date',
+                            text: this.xTitle,
                             font: {
                                 weight: '200',
                                 size: 11
@@ -105,7 +149,7 @@ export class TwitterChart {
                         // max: chartConfig.yMax,
                         title: {
                             display: true,
-                            text: 'Cases',
+                            text: this.yTitle,
                             font: {
                                 weight: '200',
                                 size: 11
