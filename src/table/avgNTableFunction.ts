@@ -1,6 +1,6 @@
 import { BasicTableFunction } from './basicTableFunction.js'
 
-export class SumNTableFunction extends BasicTableFunction {
+export class AvgNTableFunction extends BasicTableFunction {
     private n: number
 
     constructor(columnIndex: number, sourceColumnIndex: number, n: number) {
@@ -12,9 +12,7 @@ export class SumNTableFunction extends BasicTableFunction {
         const columnData = this.sourceColumn(data)
         const start = this.getStart(data, this.n)
         let sum = 0
-        for (let i = start; i < columnData.length; i++) {
-            sum += columnData[i]
-        }
-        return sum
+        for (let i = start; i < columnData.length; i++) sum += columnData[i]
+        return sum / Math.min(columnData.length, this.n)
     }
 }

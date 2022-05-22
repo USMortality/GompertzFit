@@ -3,8 +3,16 @@ import { TableFunction } from './basicTableFunction.js'
 import { SumTableFunction } from './sumTableFunction.js'
 import { SumNTableFunction } from './sumNTableFunction.js'
 import {
+    AutoIncrementTableRowType,
+    AvgNTableRowType,
+    AvgTableRowType,
+    DiffTableRowType,
     FunctionalTableRowType, LoessTableRowType, SumNTableRowType, SumTableRowType
 } from './tableRowType.js'
+import { AutoIncrementTableFunction } from './autoIncrementTableFunction.js'
+import { AvgTableFunction } from './avgTableFunction.js'
+import { AvgNTableFunction } from './avgNTableFunction.js'
+import { DiffTableFunction } from './diffTableFunction.js'
 
 export class TableFunctionFactory {
     static getFunction(
@@ -33,6 +41,30 @@ export class TableFunctionFactory {
                     loessTableRowType.sourceColumnIndex,
                     loessTableRowType.xColumnIndex
                 )
+            case AutoIncrementTableRowType:
+                return new AutoIncrementTableFunction(
+                    columnIndex,
+                    functionalTableRowType.sourceColumnIndex
+                )
+            case AvgTableRowType:
+                return new AvgTableFunction(
+                    columnIndex,
+                    functionalTableRowType.sourceColumnIndex
+                )
+            case AvgNTableRowType:
+                const avgNTableRowType
+                    = functionalTableRowType as AvgNTableRowType
+                return new AvgNTableFunction(
+                    columnIndex,
+                    avgNTableRowType.sourceColumnIndex,
+                    avgNTableRowType.n
+                )
+            case DiffTableRowType:
+                return new DiffTableFunction(
+                    columnIndex,
+                    functionalTableRowType.sourceColumnIndex
+                )
+            default: throw new Error('Requested table function not defined.')
         }
     }
 }

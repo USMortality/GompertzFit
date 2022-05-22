@@ -14,20 +14,25 @@ export abstract class BasicTableFunction implements TableFunction {
     abstract calculate(data: any[][]): number
 
     lastTargetElement(data: any[][]): number {
-        const targetRow = this.targetRow(data)
+        const targetRow = this.targetColumn(data)
         return targetRow.length > 0 ? targetRow[targetRow.length - 1] : 0
     }
 
     lastSourceElement(data: any[][]): number {
-        const sourceRow = this.sourceRow(data)
+        const sourceRow = this.sourceColumn(data)
         return sourceRow[sourceRow.length - 1]
     }
 
-    targetRow(data: any[][]): any[] {
+    targetColumn(data: any[][]): any[] {
         return data[this.columnIndex]
     }
 
-    sourceRow(data: any[][]): any[] {
+    sourceColumn(data: any[][]): any[] {
         return data[this.sourceColumnIndex]
+    }
+
+    getStart(data: any[][], n: number): number {
+        const columnData = this.sourceColumn(data)
+        return columnData.length < n ? 0 : columnData.length - n
     }
 }

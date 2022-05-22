@@ -18,10 +18,25 @@ export abstract class FunctionalTableRowType extends TableRowType {
 }
 
 // tslint:disable-next-line: max-classes-per-file
+export class AutoIncrementTableRowType extends FunctionalTableRowType { }
+
+// tslint:disable-next-line: max-classes-per-file
 export class SumTableRowType extends FunctionalTableRowType { }
 
 // tslint:disable-next-line: max-classes-per-file
 export class SumNTableRowType extends FunctionalTableRowType {
+    n: number
+    constructor(title: string, sourceColumnIndex: number, n: number) {
+        super(title, sourceColumnIndex)
+        this.n = n
+    }
+}
+
+// tslint:disable-next-line: max-classes-per-file
+export class AvgTableRowType extends FunctionalTableRowType { }
+
+// tslint:disable-next-line: max-classes-per-file
+export class AvgNTableRowType extends FunctionalTableRowType {
     n: number
     constructor(title: string, sourceColumnIndex: number, n: number) {
         super(title, sourceColumnIndex)
@@ -41,3 +56,6 @@ export class LoessTableRowType extends FunctionalTableRowType {
         this.xColumnIndex = xColumnIndex
     }
 }
+
+// tslint:disable-next-line: max-classes-per-file
+export class DiffTableRowType extends FunctionalTableRowType { }

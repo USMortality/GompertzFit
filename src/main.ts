@@ -9,7 +9,14 @@ import { loadData, saveImage, getNameFromKey, loadJson } from './common.js'
 import { Slice } from './slice.js'
 import { Series, Row } from './series.js'
 import { Command } from 'commander'
-import { LoessTableRowType, StaticTableRowType, SumNTableRowType } from './table/tableRowType.js'
+import {
+    AutoIncrementTableRowType,
+    AvgNTableRowType,
+    DiffTableRowType,
+    LoessTableRowType,
+    StaticTableRowType
+} from './table/tableRowType.js'
+import { TwitterChart } from './twitterChart.js'
 
 const ADDITIONAL_DAYS = 90
 const MAX_IMAGES = 1
@@ -58,18 +65,25 @@ async function analyzeSeries(
     const rows = data.get(jurisdiction)
     const table: Table = new Table(
         [
-            new StaticTableRowType('t'),
-            new StaticTableRowType('date'),
-            new StaticTableRowType('cases'),
-            new SumNTableRowType('Cases 7 Day Avg', 2, 7),
-            new LoessTableRowType('Smoothed 7 Day Avg', 3, 0)
+            new StaticTableRowType('Date'),
+            new StaticTableRowType('Cumulative Cases'),
+            new AutoIncrementTableRowType('t', 0),
+            new DiffTableRowType('Daily Cases', 1),
+            new AvgNTableRowType('Cases (7d AVG)', 3, 7),
+            new LoessTableRowType('Cases (7d AVG, smooth)', 4, 2)
         ]
     )
-    let i = 0
-    rows.forEach(element => {
-        table.insertRow([i++, element.date, element.cases])
+
+    rows.forEach(async (element) => {
+        table.insertRow([element.date, element.cases])
+        const chart = new TwitterChart(
+            `COVID-19 Cases [${jurisdiction}]`,
+            table.data
+        )
+        const lastT = table.data[2][table.data[2].length - 1]
+        await chart.save(`./out/test/${lastT}.png`)
     })
-    console.log(table.data)
+    // console.log(JSON.stringify(table.data, null, 2))
 
     const series: Series = new Series(config, folder, jurisdiction)
     // series.loadData(rows)

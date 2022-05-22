@@ -13,11 +13,11 @@ export class LoessTableFunction extends BasicTableFunction {
     }
 
     override calculate(data: any[][]): number {
-        const dataColumn = this.sourceRow(data)
+        const dataColumn = this.sourceColumn(data)
         if (dataColumn.length < 2) return 0
 
         const loess = this.getLoess(data[this.xColumnIndex], dataColumn)
-        return Math.round(loess[loess.length - 1] * 10) / 10
+        return loess[loess.length - 1]
     }
 
     getLoess(
