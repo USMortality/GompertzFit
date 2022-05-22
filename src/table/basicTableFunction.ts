@@ -1,5 +1,5 @@
 export interface TableFunction {
-    calculate(data: any[][]): number
+    calculate(data: any[][]): number | number[]
 }
 
 export abstract class BasicTableFunction implements TableFunction {
@@ -11,7 +11,7 @@ export abstract class BasicTableFunction implements TableFunction {
         this.sourceColumnIndex = sourceColumnIndex
     }
 
-    abstract calculate(data: any[][]): number
+    abstract calculate(data: any[][]): number | number[]
 
     lastTargetElement(data: any[][]): number {
         const targetRow = this.targetColumn(data)

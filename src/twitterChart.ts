@@ -2,6 +2,7 @@ import { ChartConfiguration } from 'chart.js'
 import { ChartJSNodeCanvas } from 'chartjs-node-canvas'
 import { promisify } from 'node:util'
 import { writeFile } from 'fs'
+import { DateTableRowType, StaticTableRowType } from './table/tableRowType'
 
 export enum TwitterChartSeriesAxisType { x, y }
 export enum TwitterChartSeriesConfigType { dot, line }
@@ -19,19 +20,32 @@ export class TwitterChart {
     xTitle: string
     yTitle: string
     data: TwitterChartSeries[]
+    labelIndex: number
+
+    private labels: StaticTableRowType
+    private chartJSNodeCanvas: ChartJSNodeCanvas
 
     constructor(
         title: string,
         subtitle: string,
         xTitle: string,
         yTitle: string,
-        data: TwitterChartSeries[]
+        labelIndex: number
     ) {
         this.title = title
         this.subtitle = subtitle
         this.xTitle = xTitle
         this.yTitle = yTitle
-        this.data = data
+        this.labelIndex = labelIndex
+
+        this.chartJSNodeCanvas = new ChartJSNodeCanvas({
+            width: 600,
+            height: 335,
+            backgroundColour: 'white',
+            plugins: {
+                modern: ['chartjs-plugin-annotation'],
+            },
+        })
     }
 
     async save(filename: string): Promise<void> {
@@ -46,10 +60,8 @@ export class TwitterChart {
             datasets.push({
                 label: data.label,
                 data: data.data,
-                borderColor: `rgba(${data.color[0]}, ${data.color[1]},` +
-                    ` ${data.color[2]}, 100%)`,
-                backgroundColor: `rgba(${data.color[0]}, ${data.color[1]},` +
-                    ` ${data.color[2]}, 100%)`,
+                borderColor: `rgba(${data.color.join(',')})`,
+                backgroundColor: `rgba(${data.color.join(',')})`,
                 fill: false,
                 borderWidth: data.type === TwitterChartSeriesConfigType.dot ?
                     0 : 2,
@@ -62,20 +74,11 @@ export class TwitterChart {
     }
 
     async makeChart(): Promise<Buffer> {
-        const width = 600
-        const height = 335
-        const backgroundColour = 'white'
-        const chartJSNodeCanvas = new ChartJSNodeCanvas({
-            width, height, backgroundColour, plugins: {
-                modern: ['chartjs-plugin-annotation'],
-            }
-        })
-
         const configuration: ChartConfiguration = {
             type: 'line',
             data: {
                 datasets: this.makeDataSet(),
-                labels: this.data[0].data
+                labels: this.data[this.labelIndex].data
             },
             options: {
                 responsive: true,
@@ -134,14 +137,20 @@ export class TwitterChart {
                                 size: 10
                             },
                             color: 'rgba(0, 0, 0, 100%)',
-                            // callback: (value, index, values) => {
-                            //     const date: Date = labelsExtended[index]
-                            //     if (date.getDate() === 1) {
-                            //         return `${date.getMonth() + 1}/` +
-                            //             `${date.getFullYear().toString()}`
-                            //     }
-                            //     return null
-                            // }
+                            callback: (value, index, values) => {
+                                const item: any = this.data[this.labelIndex]
+                                    .data[index]
+                                switch (item.constructor) {
+                                    case Date:
+                                        if (item.getDate() === 1) {
+                                            return `${item.getMonth() + 1}/` +
+                                                `${item.getFullYear().toString()}`
+                                        }
+                                        return null;
+                                    default:
+                                        return item
+                                }
+                            }
                         }
                     },
                     y: {
@@ -168,7 +177,7 @@ export class TwitterChart {
             },
             plugins: [],
         }
-        return await chartJSNodeCanvas.renderToBuffer(configuration)
+        return await this.chartJSNodeCanvas.renderToBuffer(configuration)
     }
 
     saveImage(image: Buffer, filename: string): Promise<void> {

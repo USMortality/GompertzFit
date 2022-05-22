@@ -23,7 +23,7 @@ export class Table {
     }
 
     insertRow(row: any[]): void {
-        assert(row.length === this.staticColumnLength())
+        assert(row.length === this.staticColumnLength(), 'insertRow')
         for (let i = 0; i < row.length; i++) this.data[i].push(row[i])
         this.recalculateDataFunctions()
     }
@@ -49,7 +49,9 @@ export class Table {
             const fun: TableFunction = TableFunctionFactory.getFunction(
                 targetColumnIndex, dataFunctionDefinition
             )
-            this.data[targetColumnIndex].push(fun.calculate(this.data))
+            const data: number | number[] = fun.calculate(this.data)
+            if (Array.isArray(data)) this.data[targetColumnIndex] = data
+            else this.data[targetColumnIndex].push(data)
             funIndex++
         }
     }

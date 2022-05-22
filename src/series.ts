@@ -3,12 +3,7 @@ import lowess from '@stdlib/stats-lowess'
 
 import { fillerArray, fillerDateArray, getNumberLength, loadJson } from './common.js'
 import { Slice } from './slice.js'
-
-export type Row = {
-    date: Date,
-    cases: number,
-    positiveRate: number
-}
+import { Row } from './dataLoader.js'
 
 const SMOOTHING = 15
 

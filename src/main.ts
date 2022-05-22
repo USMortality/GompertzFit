@@ -4,19 +4,23 @@ import { exec, execSync } from 'child_process'
 import * as events from 'events'
 import * as os from 'os'
 import ProgressBar from 'progress'
-
-import { loadData, saveImage, getNameFromKey, loadJson, zeroPad } from './common.js'
+import { getNameFromKey, loadJson, zeroPad } from './common.js'
 import { Slice } from './slice.js'
-import { Series, Row } from './series.js'
 import { Command } from 'commander'
 import {
     AutoIncrementTableRowType,
     AvgNTableRowType,
     DiffTableRowType,
+    GaussTableRowType,
     LoessTableRowType,
     StaticTableRowType
 } from './table/tableRowType.js'
-import { TwitterChart, TwitterChartSeriesAxisType, TwitterChartSeriesConfigType } from './twitterChart.js'
+import {
+    TwitterChart,
+    TwitterChartSeriesAxisType,
+    TwitterChartSeriesConfigType
+} from './twitterChart.js'
+import { DataLoader, Row } from './dataLoader.js'
 
 const ADDITIONAL_DAYS = 90
 const MAX_IMAGES = 1
@@ -62,18 +66,46 @@ async function analyzeSeries(
     jurisdiction: string,
     data: Map<string, Row[]>
 ): Promise<Slice[]> {
+    console.log('analyzing data...')
+
     const rows = data.get(jurisdiction)
     const table: Table = new Table(
         [
-            new StaticTableRowType('Date'),
-            new StaticTableRowType('Cumulative Cases'),
-            new AutoIncrementTableRowType('Day', 0),
-            new DiffTableRowType('Daily Cases', 1),
-            new AvgNTableRowType('Cases (7d AVG)', 3, 7),
-            new LoessTableRowType('Cases (7d AVG, smooth)', 4, 2)
+            new StaticTableRowType('Date'), // 0
+            new StaticTableRowType('Cumulative Cases'), // 1
+            new AutoIncrementTableRowType('Day'), // 2
+            new DiffTableRowType('Daily Cases', 1), // 3
+            new AvgNTableRowType('Cases (7d AVG)', 3, 7), // 4
+            new GaussTableRowType('Cases (7d AVG, smooth)', 4) // 5
         ]
     )
 
+    const chartConfig = [
+        {
+            axis: TwitterChartSeriesAxisType.x,
+            type: TwitterChartSeriesConfigType.dot,
+            label: table.columnTitles[0],
+            color: [0, 0, 0, 1]
+        },
+        {
+            axis: TwitterChartSeriesAxisType.y,
+            type: TwitterChartSeriesConfigType.line,
+            label: table.columnTitles[5],
+            color: [0, 0, 0, 1]
+        },
+        {
+            axis: TwitterChartSeriesAxisType.y,
+            type: TwitterChartSeriesConfigType.line,
+            label: table.columnTitles[4],
+            color: [200, 0, 0, 0.67]
+        },
+        {
+            axis: TwitterChartSeriesAxisType.y,
+            type: TwitterChartSeriesConfigType.dot,
+            label: table.columnTitles[3],
+            color: [0, 0, 255, 0.33]
+        },
+    ]
     for (const row of rows) {
         table.insertRow([row.date, row.cases])
         const chart = new TwitterChart(
@@ -81,44 +113,21 @@ async function analyzeSeries(
             'Source: OWID; Created by @USMortality',
             'Day',
             'COVID-19 Cases',
-            [
-                {
-                    axis: TwitterChartSeriesAxisType.x,
-                    type: TwitterChartSeriesConfigType.dot,
-                    label: table.columnTitles[2],
-                    color: [0, 0, 0],
-                    data: table.data[2]
-                },
-                {
-                    axis: TwitterChartSeriesAxisType.y,
-                    type: TwitterChartSeriesConfigType.line,
-                    label: table.columnTitles[4],
-                    color: [200, 0, 0],
-                    data: table.data[4]
-                },
-                {
-                    axis: TwitterChartSeriesAxisType.y,
-                    type: TwitterChartSeriesConfigType.dot,
-                    label: table.columnTitles[3],
-                    color: [0, 0, 200],
-                    data: table.data[3]
-                },
-                // {
-                //     axis: TwitterChartSeriesAxisType.y,
-                //     type: TwitterChartSeriesConfigType.line,
-                //     label: table.columnTitles[5],
-                //     color: [0, 0, 0],
-                //     data: table.data[5]
-                // }
-            ]
+            0
         )
+        chart.data = JSON.parse(JSON.stringify(chartConfig))
+        chart.data[0].data = table.data[0]
+        chart.data[1].data = table.data[5]
+        chart.data[2].data = table.data[4]
+        chart.data[3].data = table.data[3]
+
         const lastT = table.data[2][table.data[2].length - 1]
-        await chart.save(`./out/test/${jurisdiction}/${zeroPad(lastT, 3)}.png`)
+        await chart.save(`./out/test/${jurisdiction}/${zeroPad(lastT, 4)}.png`)
     }
 
     // console.log(JSON.stringify(table.data, null, 2))
 
-    const series: Series = new Series(config, folder, jurisdiction)
+    // const series: Series = new Series(config, folder, jurisdiction)
     // series.loadData(rows)
     // series.analyze()
     // series.analyzeSlices()
@@ -154,7 +163,8 @@ async function analyzeSeries(
     //     err => { if (err) console.log(err) }
     // )
 
-    return series.slices
+    return null
+    // return series.slices
 }
 
 async function startWorkers(client: JobClient): Promise<void> {
@@ -230,7 +240,8 @@ async function processJurisdictions(
     jurisdictionFilters: string[]
 ): Promise<void> {
     return new Promise(async (resolve) => {
-        const rows: Map<string, Row[]> = await loadData(dataset)
+        const dataLoader = new DataLoader()
+        const rows: Map<string, Row[]> = await dataLoader.loadData(dataset)
         const barSize = (jurisdictionFilters ? jurisdictionFilters.length :
             undefined) || rows.size
         let bar = getProgressbar('Analyzing jurisdictions', barSize)
@@ -274,21 +285,24 @@ async function main(): Promise<void> {
     console.log(`Filter: ${config.options.dataset}, ${jurisdictionFilters}`)
 
     // Start redis
-    const client = await new JobClient()
+    // const client = await new JobClient()
 
-    if (!config.options.dataset || config.options.dataset === 'us') {
-        console.log('Processing US states...')
-        await processJurisdictions(config, client, 'us', './data/us.csv',
-            jurisdictionFilters)
-    }
+    // if (!config.options.dataset || config.options.dataset === 'us') {
+    //     console.log('Processing US states...')
+    //     await processJurisdictions(config, client, 'us', './data/us.csv',
+    //         jurisdictionFilters)
+    // }
     if (!config.options.dataset || config.options.dataset === 'world') {
         console.log('Processing countries...')
-        await processJurisdictions(config, client, 'world', './data/world.csv',
+        await processJurisdictions(config,
+            //  client,
+            null,
+            'world', './data/world.csv',
             jurisdictionFilters)
     }
 
-    await client.tearDown()
-    console.log('Done.')
+    // await client.tearDown()
+    // console.log('Done.')
 }
 
 main()

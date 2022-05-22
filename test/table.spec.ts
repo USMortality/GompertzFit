@@ -3,6 +3,7 @@ import {
     AvgNTableRowType,
     AvgTableRowType,
     DiffTableRowType,
+    GaussTableRowType,
     LoessTableRowType,
     StaticTableRowType,
     SumNTableRowType,
@@ -12,8 +13,8 @@ import { Table } from '../src/table/table.js'
 import { expect } from 'chai'
 
 const rows = [
-    [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
-    [10, 13, 7, 8, 11, 15, 18, 10, 13, 7, 8, 11, 15, 18]
+    [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14,],
+    [70, 30, 78, 81, 66, 43, 31, 48, 93, 56, 91, 25, 19, 17,],
 ]
 
 describe('table', () => {
@@ -81,7 +82,7 @@ describe('table', () => {
         )
         table.insertRows(rows)
 
-        expect(table.data[2][13]).to.equal(164)
+        expect(table.data[2][13]).to.equal(748)
     })
 
     it('sumNFunction', () => {
@@ -94,7 +95,7 @@ describe('table', () => {
         )
         table.insertRows(rows)
 
-        expect(table.data[2][13]).to.equal(82)
+        expect(table.data[2][13]).to.equal(349)
     })
 
     it('loessFunction', () => {
@@ -102,15 +103,30 @@ describe('table', () => {
             [
                 new StaticTableRowType('t'),
                 new StaticTableRowType('Cases'),
-                new SumNTableRowType('Cases Sum', 1, 7),
-                new LoessTableRowType('Cases Avg', 1, 0),
-                new LoessTableRowType('Cases 7day Avg', 2, 0)
+                new AvgNTableRowType('Cases 7d Avg', 1, 7),
+                new LoessTableRowType('Cases 7day Avg (Smooth)', 2, 0)
             ]
         )
         table.insertRows(rows)
 
-        expect(table.data[3][13]).to.equal(15.9)
-        expect(table.data[4][11]).to.equal(82.6)
+        expect(table.data[2][13]).to.equal(49.857142857142854)
+        expect(table.data[3][11]).to.equal(58.454514362392956)
+    })
+
+    it('gaussFunction', () => {
+        const table = new Table(
+            [
+                new StaticTableRowType('t'),
+                new StaticTableRowType('Cases'),
+                new AvgNTableRowType('Cases 7d Avg', 1, 7),
+                new GaussTableRowType('Cases 7d Avg (Smooth)', 2)
+            ]
+        )
+        table.insertRows(rows)
+
+        table.print()
+        expect(table.data[2][11]).to.equal(55.285714285714285)
+        expect(table.data[3][11]).to.equal(53.35532598889015)
     })
 
     it('autoIncrementFunction', () => {
@@ -118,7 +134,7 @@ describe('table', () => {
             [
                 new StaticTableRowType('t'),
                 new StaticTableRowType('Cases'),
-                new AutoIncrementTableRowType('t', 0)
+                new AutoIncrementTableRowType('t')
             ]
         )
         table.insertRows(rows)
@@ -134,7 +150,7 @@ describe('table', () => {
             ]
         )
         table.insertRows(rows)
-        expect(table.data[2][9]).to.equal(11.2)
+        expect(table.data[2][9]).to.equal(59.6)
     })
 
     it('avgNFunction', () => {
@@ -146,7 +162,8 @@ describe('table', () => {
             ]
         )
         table.insertRows(rows)
-        expect(table.data[2][13]).to.equal(11.714285714285714)
+
+        expect(table.data[2][13]).to.equal(49.857142857142854)
     })
 
     it('diffFunction', () => {
@@ -168,7 +185,7 @@ describe('table', () => {
             [
                 new StaticTableRowType('Date'),
                 new StaticTableRowType('Cumulative Cases'),
-                new AutoIncrementTableRowType('t', 0),
+                new AutoIncrementTableRowType('t'),
                 new DiffTableRowType('Daily Cases', 1),
                 new AvgNTableRowType('Cases (7d AVG)', 3, 7),
                 new LoessTableRowType('Cases (7d AVG, smooth)', 4, 2)
@@ -206,7 +223,7 @@ describe('table', () => {
                 14021279
             ]
         ])
-        table.print()
+
         expect(table.data[3][13]).to.equal(196161)
         expect(table.data[4][13]).to.equal(169806.14285714287)
         expect(table.data[5][13]).to.equal(168421.3794513356)

@@ -7,12 +7,17 @@ import {
     AvgNTableRowType,
     AvgTableRowType,
     DiffTableRowType,
-    FunctionalTableRowType, LoessTableRowType, SumNTableRowType, SumTableRowType
+    FunctionalTableRowType,
+    GaussTableRowType,
+    LoessTableRowType,
+    SumNTableRowType,
+    SumTableRowType
 } from './tableRowType.js'
 import { AutoIncrementTableFunction } from './autoIncrementTableFunction.js'
 import { AvgTableFunction } from './avgTableFunction.js'
 import { AvgNTableFunction } from './avgNTableFunction.js'
 import { DiffTableFunction } from './diffTableFunction.js'
+import { GaussTableFunction } from './gaussTableFunction.js'
 
 export class TableFunctionFactory {
     static getFunction(
@@ -40,6 +45,13 @@ export class TableFunctionFactory {
                     columnIndex,
                     loessTableRowType.sourceColumnIndex,
                     loessTableRowType.xColumnIndex
+                )
+            case GaussTableRowType:
+                const gaussTableRowType
+                    = functionalTableRowType as GaussTableRowType
+                return new GaussTableFunction(
+                    columnIndex,
+                    gaussTableRowType.sourceColumnIndex
                 )
             case AutoIncrementTableRowType:
                 return new AutoIncrementTableFunction(

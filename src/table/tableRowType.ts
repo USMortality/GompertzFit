@@ -9,9 +9,12 @@ export abstract class TableRowType {
 export class StaticTableRowType extends TableRowType { }
 
 // tslint:disable-next-line: max-classes-per-file
+export class DateTableRowType extends StaticTableRowType { }
+
+// tslint:disable-next-line: max-classes-per-file
 export abstract class FunctionalTableRowType extends TableRowType {
     sourceColumnIndex: number
-    constructor(title: string, sourceColumnIndex: number) {
+    constructor(title: string, sourceColumnIndex?: number) {
         super(title)
         this.sourceColumnIndex = sourceColumnIndex
     }
@@ -59,3 +62,6 @@ export class LoessTableRowType extends FunctionalTableRowType {
 
 // tslint:disable-next-line: max-classes-per-file
 export class DiffTableRowType extends FunctionalTableRowType { }
+
+// tslint:disable-next-line: max-classes-per-file
+export class GaussTableRowType extends FunctionalTableRowType { }

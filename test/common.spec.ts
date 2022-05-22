@@ -1,11 +1,11 @@
+import { DataLoader, Row } from './../src/dataLoader'
 import { deepEqual } from 'assert'
 import { expect } from 'chai'
 import 'jest'
 import {
     addDays, fillerArray, fillerDateArray, getKey, getNameFromKey,
-    getNumberLength, processCsvRows, capitalizeFirstLetters, dateString
+    getNumberLength, capitalizeFirstLetters, dateString
 } from '../src/common.js'
-import { Row } from '../src/series.js'
 
 describe('common.ts', () => {
     describe('fillerArray', () => {
@@ -58,8 +58,9 @@ describe('common.ts', () => {
         })
     })
     describe('processCsvRows', () => {
+        const dataLoader = new DataLoader()
         it('usa.csv format parsing', async () => {
-            const data = await processCsvRows([
+            const data = await dataLoader.processCsvRows([
                 { 'date': '2020-03-17', 'state': 'Florida', 'cases': '10' },
                 { 'date': '2020-03-18', 'state': 'Florida', 'cases': '15' },
                 { 'date': '2020-03-17', 'state': 'Texas', 'cases': '25' }
@@ -71,7 +72,7 @@ describe('common.ts', () => {
             expect(flData[0].cases).to.equal(10)
         })
         it('world.csv format parsing', async () => {
-            const data = await processCsvRows([
+            const data = await dataLoader.processCsvRows([
                 {
                     'date': '2020-03-17',
                     'location': 'Germany',

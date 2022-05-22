@@ -159,6 +159,14 @@ export async function makeChart(
                         size: 18
                     }
                 },
+                subtitle: {
+                    display: true,
+                    color: 'rgba(0, 0, 0, 100%)',
+                    text: `COVID-19 Cases [${title}]`,
+                    font: {
+                        size: 18
+                    }
+                },
                 legend: {
                     display: true,
                     labels: {
