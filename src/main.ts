@@ -75,7 +75,7 @@ async function analyzeSeries(
             new AutoIncrementTableRowType('Day'), // 2
             new DiffTableRowType('Daily Cases', 1), // 3
             new AvgNTableRowType('Cases (7d AVG)', 3, 7), // 4
-            new GaussTableRowType('Cases (7d AVG, smooth)', 4) // 5
+            new GaussTableRowType('Cases (7d AVG, smooth)', 4, 10) // 5
         ]
     )
 

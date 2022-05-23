@@ -9,14 +9,22 @@ import {
 import { expect } from 'chai'
 import 'jest'
 import looksSame from 'looks-same'
-import { AvgNTableRowType, DateTableRowType, StaticTableRowType } from '../src/table/tableRowType'
+import {
+    AvgNTableRowType,
+    DateTableRowType,
+    GaussTableRowType,
+    LocalMinTableRowType,
+    StaticTableRowType
+} from '../src/table/tableRowType'
 
 describe('TwitterChart', () => {
     it('create date chart', async () => {
         const table = new Table([
             new DateTableRowType('Date'),
             new StaticTableRowType('Cases'),
-            new AvgNTableRowType('Cases (Avg 7)', 1, 7)
+            new AvgNTableRowType('Cases (Avg 7)', 1, 7),
+            new GaussTableRowType('Cases (Avg 7, smooth)', 2, 1),
+            new LocalMinTableRowType('Minima', 3)
         ])
         const rows = [
             [
@@ -35,10 +43,10 @@ describe('TwitterChart', () => {
                 new Date(2020, 1, 13),
                 new Date(2020, 1, 14),
             ],
-            [70, 30, 78, 81, 66, 43, 31, 48, 93, 56, 91, 25, 19, 17,]
+            [70, 30, 78, 81, 66, 43, 31, 48, 93, 56, 91, 25, 19, 17,],
         ]
         table.insertRows(rows)
-        // console.log(table.data)
+
         const twitterchart = new TwitterChart(
             'Title', 'Subtitle', 'X-axis', 'Y-axis', 0
         )
@@ -63,7 +71,14 @@ describe('TwitterChart', () => {
                 label: table.columnTitles[2],
                 color: [0, 0, 0, 1],
                 data: table.data[2]
-            }
+            },
+            {
+                axis: TwitterChartSeriesAxisType.x,
+                type: TwitterChartSeriesConfigType.label,
+                label: 'Minimum',
+                color: [0, 0, 0, 1],
+                data: table.data[4]
+            },
         ]
         await twitterchart.save('./test/out/test.png')
         looksSame('./test/out/expected.png', './test/out/test.png',
@@ -80,10 +95,9 @@ describe('TwitterChart', () => {
         ])
         const rows = [
             [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
-            [70, 30, 78, 81, 66, 43, 31, 48, 93, 56, 91, 25, 19, 17,]
+            [70, 30, 78, 81, 66, 43, 31, 48, 93, 56, 91, 25, 19, 17,],
         ]
         table.insertRows(rows)
-        // console.log(table.data)
         const twitterchart = new TwitterChart(
             'Title', 'Subtitle', 'X-axis', 'Y-axis', 0
         )

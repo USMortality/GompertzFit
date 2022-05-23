@@ -11,7 +11,8 @@ import {
     DiffTableRowType,
     StaticTableRowType,
     LoessTableRowType,
-    GaussTableRowType
+    GaussTableRowType,
+    LocalMinTableRowType
 } from './table/tableRowType.js'
 import { getNameFromKey, printMemory, zeroPad } from './common.js'
 
@@ -24,7 +25,8 @@ class Runner {
             new AutoIncrementTableRowType('Day'), // 2
             new DiffTableRowType('Daily Cases', 1), // 3
             new AvgNTableRowType('Cases (7d AVG)', 3, 7), // 4
-            new GaussTableRowType('Cases (7d AVG, smooth)', 4, 100) // 5
+            new GaussTableRowType('Cases (7d AVG, smooth)', 4, 100), // 5
+            new LocalMinTableRowType('Minima', 5) // 6
         ]
     )
 
@@ -37,7 +39,7 @@ class Runner {
 
     async processData(): Promise<void> {
         console.log('Processing data...')
-        const jurisdiction = 'germany'
+        const jurisdiction = 'united_states'
 
         const chart = new TwitterChart(
             `COVID-19 Cases [${getNameFromKey(jurisdiction)}]`,
@@ -71,6 +73,12 @@ class Runner {
                 label: this.table.columnTitles[3],
                 color: [0, 0, 255, 0.33]
             },
+            {
+                axis: TwitterChartSeriesAxisType.x,
+                type: TwitterChartSeriesConfigType.label,
+                label: 'Minima',
+                color: [0, 0, 0, 1],
+            },
         ]
 
         for (const row of this.data.get(jurisdiction)) {
@@ -82,10 +90,11 @@ class Runner {
             chart.data[1].data = this.table.data[5]
             chart.data[2].data = this.table.data[4]
             chart.data[3].data = this.table.data[3]
+            chart.data[4].data = this.table.data[6]
 
             const lastT = this.table.data[2][this.table.data[2].length - 1]
             await chart.save(`./out/test/${jurisdiction}/${zeroPad(lastT, 3)}.png`)
-            printMemory()
+            // printMemory()
         }
         console.log('Processing data finished.')
     }

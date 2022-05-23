@@ -77,4 +77,8 @@ export class GaussTableRowType extends FunctionalTableRowType {
 }
 
 // tslint:disable-next-line: max-classes-per-file
-export class LocalMinTableRowType extends FunctionalTableRowType { }
+export class LocalMinTableRowType extends FunctionalTableRowType {
+    constructor(title: string, sourceColumnIndex: number) {
+        super(title, sourceColumnIndex)
+    }
+}

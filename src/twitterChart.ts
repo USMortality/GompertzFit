@@ -5,13 +5,30 @@ import { writeFile } from 'fs'
 import { DateTableRowType, StaticTableRowType } from './table/tableRowType'
 
 export enum TwitterChartSeriesAxisType { x, y }
-export enum TwitterChartSeriesConfigType { dot, line }
+export enum TwitterChartSeriesConfigType { dot, line, label }
 export type TwitterChartSeries = {
     axis: TwitterChartSeriesAxisType,
     type: TwitterChartSeriesConfigType,
     label: string,
     color: number[],
-    data: any[]
+    data?: any[]
+}
+const line = {
+    type: 'line',
+    xMin: 60,
+    xMax: 60,
+    borderColor: 'rgb(255, 0, 0)',
+    borderWidth: 1,
+    borderDash: [0, 0],
+    label: {
+        rotation: false,
+        position: 'start',
+        content: [],
+        font: {
+            size: 8
+        },
+        enabled: false
+    }
 }
 
 export class TwitterChart {
@@ -53,6 +70,28 @@ export class TwitterChart {
         await this.saveImage(buffer, filename)
     }
 
+    makeLabels(): any[] {
+        const labels: any[] = []
+        for (const data of this.data) {
+            if (data.axis === TwitterChartSeriesAxisType.x &&
+                data.type === TwitterChartSeriesConfigType.label) {
+                for (let i = 0; i < data.data.length; i++) {
+                    const row = data.data[i]
+                    if (row > 0) {
+                        line.xMin = i
+                        line.xMax = i
+                        line.borderDash = [4, 4]
+                        line.borderColor = `rgb(${data.color.join(',')})`
+                        line.label.enabled = true
+                        line.label.content = [data.label]
+                        labels.push(JSON.parse(JSON.stringify(line)))
+                    }
+                }
+            }
+        }
+        return labels
+    }
+
     makeDataSet(): any[] {
         const datasets: any[] = []
         for (const data of this.data) {
@@ -85,7 +124,7 @@ export class TwitterChart {
                 devicePixelRatio: 2,
                 plugins: {
                     annotation: {
-                        // annotations: chartConfig.lines
+                        annotations: this.makeLabels()
                     },
                     title: {
                         display: true,
