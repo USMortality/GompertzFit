@@ -14,9 +14,15 @@ import {
     GaussTableRowType,
     LocalExtremaTableRowType
 } from './table/tableRowType.js'
-import { dateString, getNameFromKey, printMemory, zeroPad } from './common.js'
+import {
+    dateString,
+    fillerDateArray,
+    getNameFromKey,
+    zeroPad
+} from './common.js'
 
 class Runner {
+    jurisdiction = 'united_states'
     data: Map<string, Row[]>
     table: Table = new Table(
         [
@@ -30,6 +36,10 @@ class Runner {
             new LocalExtremaTableRowType('Max', 5, LocalExtramaType.MAX) // 7
         ]
     )
+    sliceTable: Table = new Table([
+        new StaticTableRowType('Date'), // 0
+        new StaticTableRowType('Cases (7d AVG)'), // 1
+    ])
 
     async loadData(): Promise<void> {
         console.log('Loading dataset...')
@@ -38,16 +48,12 @@ class Runner {
         console.log('Dataset loaded.')
     }
 
-    async processData(): Promise<void> {
-        console.log('Processing data...')
-        const jurisdiction = 'united_states'
-
+    async makeOverviewChart(): Promise<void> {
         const chart = new TwitterChart(
-            `COVID-19 Cases [${getNameFromKey(jurisdiction)}]`,
+            `COVID-19 Cases [${getNameFromKey(this.jurisdiction)}]`,
             'Source: OWID; Created by @USMortality',
             'Day',
-            'COVID-19 Cases',
-            0
+            'COVID-19 Cases'
         )
         const chartConfig = [
             {
@@ -92,8 +98,8 @@ class Runner {
             },
         ]
 
-        for (const row of this.data.get(jurisdiction)) {
-            // console.log(`Processing ${row.date}`)
+        for (const row of this.data.get(this.jurisdiction)) {
+            console.log(`Processing ${row.date}`)
             this.table.insertRow([row.date, row.cases])
 
             chart.data = chartConfig
@@ -105,10 +111,53 @@ class Runner {
             chart.data[5].data = this.table.data[7]
 
             const lastT = this.table.data[2][this.table.data[2].length - 1]
-            await chart.save(`./out/test/${jurisdiction}/${zeroPad(lastT, 3)}.png`)
-            // printMemory()
+            await chart.save(`./out/test/${this.jurisdiction}/${zeroPad(lastT, 3)}.png`)
         }
-        this.table.saveCsv('./out/out.csv')
+    }
+
+    async makeSliceChart(sliceIndex: number, slice: any[][]): Promise<void> {
+        const chart = new TwitterChart(
+            `COVID-19 Cases - Latest Wave [${getNameFromKey(this.jurisdiction)}]`,
+            'Source: OWID; Created by @USMortality',
+            'Day',
+            'COVID-19 Cases'
+        )
+        const chartConfig = [
+            {
+                axis: TwitterChartSeriesAxisType.x,
+                type: TwitterChartSeriesConfigType.dot,
+                label: this.table.columnTitles[0],
+                color: [0, 0, 0, 1]
+            },
+            {
+                axis: TwitterChartSeriesAxisType.y,
+                type: TwitterChartSeriesConfigType.line,
+                label: this.table.columnTitles[5],
+                color: [0, 0, 0, 1]
+            },
+        ]
+
+        const date = fillerDateArray(slice[0][slice[0].length - 1], 120)
+        this.sliceTable.insertRows([date, slice[4]])
+
+        chart.data = chartConfig
+        chart.data[0].data = this.sliceTable.data[0]
+        chart.data[1].data = this.sliceTable.data[1]
+
+        await chart.save(`./out/test/${this.jurisdiction}/_latest.png`)
+    }
+
+    async processData(): Promise<void> {
+        console.log('Processing data...')
+
+        await this.makeOverviewChart()
+
+        // Latest outbreak
+        const sliceData = this.table.splitAt(6, 1)
+        const sliceIndex = sliceData.length - 1
+        const lastSlice = sliceData[sliceIndex]
+        await this.makeSliceChart(sliceIndex, lastSlice)
+
         console.log('Processing data finished.')
     }
 

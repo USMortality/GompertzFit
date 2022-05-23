@@ -45,7 +45,7 @@ export class TwitterChart {
         subtitle: string,
         xTitle: string,
         yTitle: string,
-        labelIndex: number
+        labelIndex: number = 0
     ) {
         this.title = title
         this.subtitle = subtitle
