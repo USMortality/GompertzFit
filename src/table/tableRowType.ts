@@ -64,4 +64,17 @@ export class LoessTableRowType extends FunctionalTableRowType {
 export class DiffTableRowType extends FunctionalTableRowType { }
 
 // tslint:disable-next-line: max-classes-per-file
-export class GaussTableRowType extends FunctionalTableRowType { }
+export class GaussTableRowType extends FunctionalTableRowType {
+    iterations: number
+    constructor(
+        title: string,
+        sourceColumnIndex: number,
+        iterations: number
+    ) {
+        super(title, sourceColumnIndex)
+        this.iterations = iterations
+    }
+}
+
+// tslint:disable-next-line: max-classes-per-file
+export class LocalMinTableRowType extends FunctionalTableRowType { }

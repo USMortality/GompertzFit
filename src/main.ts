@@ -12,7 +12,6 @@ import {
     AvgNTableRowType,
     DiffTableRowType,
     GaussTableRowType,
-    LoessTableRowType,
     StaticTableRowType
 } from './table/tableRowType.js'
 import {
@@ -66,7 +65,7 @@ async function analyzeSeries(
     jurisdiction: string,
     data: Map<string, Row[]>
 ): Promise<Slice[]> {
-    console.log('analyzing data...')
+    console.log('Analyzing data...')
 
     const rows = data.get(jurisdiction)
     const table: Table = new Table(
@@ -107,6 +106,7 @@ async function analyzeSeries(
         },
     ]
     for (const row of rows) {
+        console.log(`Processing ${row.date}`)
         table.insertRow([row.date, row.cases])
         const chart = new TwitterChart(
             `COVID-19 Cases [${getNameFromKey(jurisdiction)}]`,
@@ -124,6 +124,7 @@ async function analyzeSeries(
         const lastT = table.data[2][table.data[2].length - 1]
         await chart.save(`./out/test/${jurisdiction}/${zeroPad(lastT, 4)}.png`)
     }
+    console.log('Processing data finished.')
 
     // console.log(JSON.stringify(table.data, null, 2))
 

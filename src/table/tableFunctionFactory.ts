@@ -9,6 +9,7 @@ import {
     DiffTableRowType,
     FunctionalTableRowType,
     GaussTableRowType,
+    LocalMinTableRowType,
     LoessTableRowType,
     SumNTableRowType,
     SumTableRowType
@@ -18,6 +19,7 @@ import { AvgTableFunction } from './avgTableFunction.js'
 import { AvgNTableFunction } from './avgNTableFunction.js'
 import { DiffTableFunction } from './diffTableFunction.js'
 import { GaussTableFunction } from './gaussTableFunction.js'
+import { LocalMinTableFunction } from './localMinTableFunction.js'
 
 export class TableFunctionFactory {
     static getFunction(
@@ -51,7 +53,8 @@ export class TableFunctionFactory {
                     = functionalTableRowType as GaussTableRowType
                 return new GaussTableFunction(
                     columnIndex,
-                    gaussTableRowType.sourceColumnIndex
+                    gaussTableRowType.sourceColumnIndex,
+                    gaussTableRowType.iterations
                 )
             case AutoIncrementTableRowType:
                 return new AutoIncrementTableFunction(
@@ -73,6 +76,11 @@ export class TableFunctionFactory {
                 )
             case DiffTableRowType:
                 return new DiffTableFunction(
+                    columnIndex,
+                    functionalTableRowType.sourceColumnIndex
+                )
+            case LocalMinTableRowType:
+                return new LocalMinTableFunction(
                     columnIndex,
                     functionalTableRowType.sourceColumnIndex
                 )

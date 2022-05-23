@@ -4,6 +4,7 @@ import {
     AvgTableRowType,
     DiffTableRowType,
     GaussTableRowType,
+    LocalMinTableRowType,
     LoessTableRowType,
     StaticTableRowType,
     SumNTableRowType,
@@ -119,14 +120,14 @@ describe('table', () => {
                 new StaticTableRowType('t'),
                 new StaticTableRowType('Cases'),
                 new AvgNTableRowType('Cases 7d Avg', 1, 7),
-                new GaussTableRowType('Cases 7d Avg (Smooth)', 2)
+                new GaussTableRowType('Cases 7d Avg (Smooth)', 2, 1)
             ]
         )
         table.insertRows(rows)
 
         table.print()
         expect(table.data[2][11]).to.equal(55.285714285714285)
-        expect(table.data[3][11]).to.equal(53.35532598889015)
+        expect(table.data[3][11]).to.equal(55.37773153875936)
     })
 
     it('autoIncrementFunction', () => {
@@ -180,6 +181,20 @@ describe('table', () => {
         )
     })
 
+    it('localMinFunction', () => {
+        const table = new Table(
+            [
+                new StaticTableRowType('t'),
+                new StaticTableRowType('Cases'),
+                new LocalMinTableRowType('min', 1)
+            ]
+        )
+        table.insertRows(rows)
+        expect(table.data[2]).to.eql(
+            [0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0,]
+        )
+    })
+
     it('real example', () => {
         const table = new Table(
             [
@@ -228,5 +243,4 @@ describe('table', () => {
         expect(table.data[4][13]).to.equal(169806.14285714287)
         expect(table.data[5][13]).to.equal(168421.3794513356)
     })
-
 })
