@@ -9,7 +9,7 @@ export class Table {
     columnTitles: string[] = []
     private tableRowTypes: TableRowType[] = []
     private dataFunctionDefinitions: FunctionalTableRowType[] = []
-    public data: any[] = []
+    public data: any[][] = []
 
     constructor(
         tableRowTypes: TableRowType[]
@@ -42,6 +42,35 @@ export class Table {
             }
             this.insertRow(result)
         }
+    }
+
+    getRowAt(rowIndex: number): any[] {
+        const result = []
+        for (const column of this.data) {
+            result.push(column[rowIndex])
+        }
+        return result
+    }
+
+    splitAt(columnIndex: number, comparator: any): any[][] {
+        const result: any[][] = []
+        let lastRowIndex = 0
+
+        for (let i = 0; i < this.data[columnIndex].length; i++) {
+            const subTableResult = []
+            if (this.data[columnIndex][i] === comparator
+                || this.data[columnIndex].length - 1 === i) {
+                for (const column of this.data) {
+                    const subItem = column.slice(lastRowIndex, i)
+                    subTableResult.push(subItem)
+                }
+                lastRowIndex = i
+            } else continue
+
+            result.push(subTableResult)
+        }
+
+        return result
     }
 
     print(): void {

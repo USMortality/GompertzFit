@@ -260,4 +260,35 @@ describe('table', () => {
         expect(table.data[4][13]).to.equal(169806.14285714287)
         expect(table.data[5][13]).to.equal(168421.3794513356)
     })
+
+    it('splitAt, max', () => {
+        const table = new Table(
+            [
+                new StaticTableRowType('t'),
+                new StaticTableRowType('Cases'),
+                new LocalExtremaTableRowType('min', 1, LocalExtramaType.MIN)
+            ]
+        )
+        table.insertRows(rows)
+        const splitTable = table.splitAt(2, 1)
+
+        expect(splitTable).to.eql(
+            [
+                [[1], [70], [0]],
+                [[2, 3, 4, 5, 6], [30, 78, 81, 66, 43], [1, 0, 0, 0, 0]],
+                [[7, 8, 9], [31, 48, 93], [1, 0, 0]],
+                [[10, 11, 12, 13], [56, 91, 25, 19], [1, 0, 0, 0]]
+            ]
+        )
+
+        const subTable = new Table([
+            new StaticTableRowType('t'),
+            new StaticTableRowType('Cases')
+        ])
+        const subData = splitTable[splitTable.length - 1]
+        subTable.insertRows(subData.slice(0, -1))
+        expect(subTable.data).to.eql(
+            [[10, 11, 12, 13], [56, 91, 25, 19]]
+        )
+    })
 })
