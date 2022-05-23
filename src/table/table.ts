@@ -2,6 +2,8 @@ import { TableFunction } from './basicTableFunction.js'
 import { assert } from 'console'
 import { TableFunctionFactory } from './tableFunctionFactory.js'
 import { FunctionalTableRowType, TableRowType } from './tableRowType.js'
+import os from 'os'
+import fs from 'fs'
 
 export class Table {
     columnTitles: string[] = []
@@ -42,6 +44,24 @@ export class Table {
         }
     }
 
+    print(): void {
+        console.log(this.data)
+    }
+
+    saveCsv(filepath: string): void {
+        let result = this.makeCsvRow(this.columnTitles)
+        for (let row = 0; row < this.data[0].length; row++) {
+            const data = []
+            for (const column of this.data) {
+                data.push(column[row])
+            }
+            result += this.makeCsvRow(data)
+        }
+        fs.writeFile(filepath, result, (err) => {
+            if (err) return console.log(err)
+        })
+    }
+
     private recalculateDataFunctions(): void {
         let funIndex = 0
         for (const dataFunctionDefinition of this.dataFunctionDefinitions) {
@@ -60,7 +80,7 @@ export class Table {
         return this.data.length - this.dataFunctionDefinitions.length
     }
 
-    print(): void {
-        console.log(this.data)
+    private makeCsvRow(arr: any[]): string {
+        return '"' + Object.values(arr).join('","') + '"' + os.EOL
     }
 }

@@ -2,14 +2,13 @@ import { ChartConfiguration } from 'chart.js'
 import { ChartJSNodeCanvas } from 'chartjs-node-canvas'
 import { promisify } from 'node:util'
 import { writeFile } from 'fs'
-import { DateTableRowType, StaticTableRowType } from './table/tableRowType'
 
 export enum TwitterChartSeriesAxisType { x, y }
 export enum TwitterChartSeriesConfigType { dot, line, label }
 export type TwitterChartSeries = {
     axis: TwitterChartSeriesAxisType,
     type: TwitterChartSeriesConfigType,
-    label: string,
+    label: string | ((rowIndex: number) => string[]),
     color: number[],
     data?: any[]
 }
@@ -39,7 +38,6 @@ export class TwitterChart {
     data: TwitterChartSeries[]
     labelIndex: number
 
-    private labels: StaticTableRowType
     private chartJSNodeCanvas: ChartJSNodeCanvas
 
     constructor(
@@ -83,13 +81,21 @@ export class TwitterChart {
                         line.borderDash = [4, 4]
                         line.borderColor = `rgb(${data.color.join(',')})`
                         line.label.enabled = true
-                        line.label.content = [data.label]
+                        line.label.content = this.getLineLabel(data.label, i)
                         labels.push(JSON.parse(JSON.stringify(line)))
                     }
                 }
             }
         }
         return labels
+    }
+
+    private getLineLabel(
+        label: string | ((rowIndex: number) => string[]),
+        rowIndex: number
+    ): string[] {
+        if (label instanceof Function) return label(rowIndex)
+        else return [label]
     }
 
     makeDataSet(): any[] {

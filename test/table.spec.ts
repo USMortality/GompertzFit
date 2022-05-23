@@ -1,10 +1,11 @@
+import { LocalExtramaType } from './../src/table/localExtremaTableFunction'
 import {
     AutoIncrementTableRowType,
     AvgNTableRowType,
     AvgTableRowType,
     DiffTableRowType,
     GaussTableRowType,
-    LocalMinTableRowType,
+    LocalExtremaTableRowType,
     LoessTableRowType,
     StaticTableRowType,
     SumNTableRowType,
@@ -125,7 +126,6 @@ describe('table', () => {
         )
         table.insertRows(rows)
 
-        table.print()
         expect(table.data[2][11]).to.equal(55.285714285714285)
         expect(table.data[3][11]).to.equal(55.37773153875936)
     })
@@ -181,17 +181,34 @@ describe('table', () => {
         )
     })
 
-    it('localMinFunction', () => {
+    it('localExtremaFunction, min', () => {
         const table = new Table(
             [
                 new StaticTableRowType('t'),
                 new StaticTableRowType('Cases'),
-                new LocalMinTableRowType('min', 1)
+                new LocalExtremaTableRowType('min', 1, LocalExtramaType.MIN)
             ]
         )
         table.insertRows(rows)
+        // [70, 30, 78, 81, 66, 43, 31, 48, 93, 56, 91, 25, 19, 17,],
+
         expect(table.data[2]).to.eql(
-            [0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0,]
+            [0, 1, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0]
+        )
+    })
+
+    it('localExtremaFunction, max', () => {
+        const table = new Table(
+            [
+                new StaticTableRowType('t'),
+                new StaticTableRowType('Cases'),
+                new LocalExtremaTableRowType('max', 1, LocalExtramaType.MAX)
+            ]
+        )
+        table.insertRows(rows)
+
+        expect(table.data[2]).to.eql(
+            [0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0]
         )
     })
 

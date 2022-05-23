@@ -1,3 +1,4 @@
+import { LocalExtramaType } from './table/localExtremaTableFunction.js'
 import {
     TwitterChart,
     TwitterChartSeriesAxisType,
@@ -10,11 +11,10 @@ import {
     AvgNTableRowType,
     DiffTableRowType,
     StaticTableRowType,
-    LoessTableRowType,
     GaussTableRowType,
-    LocalMinTableRowType
+    LocalExtremaTableRowType
 } from './table/tableRowType.js'
-import { getNameFromKey, printMemory, zeroPad } from './common.js'
+import { dateString, getNameFromKey, printMemory, zeroPad } from './common.js'
 
 class Runner {
     data: Map<string, Row[]>
@@ -26,7 +26,8 @@ class Runner {
             new DiffTableRowType('Daily Cases', 1), // 3
             new AvgNTableRowType('Cases (7d AVG)', 3, 7), // 4
             new GaussTableRowType('Cases (7d AVG, smooth)', 4, 100), // 5
-            new LocalMinTableRowType('Minima', 5) // 6
+            new LocalExtremaTableRowType('Min', 5, LocalExtramaType.MIN), // 6
+            new LocalExtremaTableRowType('Max', 5, LocalExtramaType.MAX) // 7
         ]
     )
 
@@ -65,7 +66,7 @@ class Runner {
                 axis: TwitterChartSeriesAxisType.y,
                 type: TwitterChartSeriesConfigType.line,
                 label: this.table.columnTitles[4],
-                color: [200, 0, 0, 0.67]
+                color: [0, 200, 0, 0.67]
             },
             {
                 axis: TwitterChartSeriesAxisType.y,
@@ -76,26 +77,38 @@ class Runner {
             {
                 axis: TwitterChartSeriesAxisType.x,
                 type: TwitterChartSeriesConfigType.label,
-                label: 'Minima',
-                color: [0, 0, 0, 1],
+                label: (rowIndex: number): string[] => {
+                    return ['Minimum', dateString(this.table.data[0][rowIndex])]
+                },
+                color: [0, 0, 255, 1],
+            },
+            {
+                axis: TwitterChartSeriesAxisType.x,
+                type: TwitterChartSeriesConfigType.label,
+                label: (rowIndex: number): string[] => {
+                    return ['Maximum', dateString(this.table.data[0][rowIndex])]
+                },
+                color: [255, 0, 0, 1],
             },
         ]
 
         for (const row of this.data.get(jurisdiction)) {
-            console.log(`Processing ${row.date}`)
+            // console.log(`Processing ${row.date}`)
             this.table.insertRow([row.date, row.cases])
 
-            chart.data = JSON.parse(JSON.stringify(chartConfig))
+            chart.data = chartConfig
             chart.data[0].data = this.table.data[0]
             chart.data[1].data = this.table.data[5]
             chart.data[2].data = this.table.data[4]
             chart.data[3].data = this.table.data[3]
             chart.data[4].data = this.table.data[6]
+            chart.data[5].data = this.table.data[7]
 
             const lastT = this.table.data[2][this.table.data[2].length - 1]
             await chart.save(`./out/test/${jurisdiction}/${zeroPad(lastT, 3)}.png`)
             // printMemory()
         }
+        this.table.saveCsv('./out/out.csv')
         console.log('Processing data finished.')
     }
 

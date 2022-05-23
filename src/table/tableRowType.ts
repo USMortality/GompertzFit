@@ -1,3 +1,4 @@
+import { LocalExtramaType } from './localExtremaTableFunction'
 export abstract class TableRowType {
     title: string
     constructor(title: string) {
@@ -77,8 +78,14 @@ export class GaussTableRowType extends FunctionalTableRowType {
 }
 
 // tslint:disable-next-line: max-classes-per-file
-export class LocalMinTableRowType extends FunctionalTableRowType {
-    constructor(title: string, sourceColumnIndex: number) {
+export class LocalExtremaTableRowType extends FunctionalTableRowType {
+    type: LocalExtramaType
+    constructor(
+        title: string,
+        sourceColumnIndex: number,
+        type: LocalExtramaType
+    ) {
         super(title, sourceColumnIndex)
+        this.type = type
     }
 }

@@ -1,8 +1,6 @@
-import { AvgNTableFunction } from './../src/table/avgNTableFunction'
 import { Table } from '../src/table/table'
 import {
     TwitterChart,
-    TwitterChartSeries,
     TwitterChartSeriesAxisType,
     TwitterChartSeriesConfigType
 } from './../src/twitterChart'
@@ -13,9 +11,11 @@ import {
     AvgNTableRowType,
     DateTableRowType,
     GaussTableRowType,
-    LocalMinTableRowType,
+    LocalExtremaTableRowType,
     StaticTableRowType
 } from '../src/table/tableRowType'
+import { LocalExtramaType } from '../src/table/localExtremaTableFunction'
+import { dateString } from '../src/common'
 
 describe('TwitterChart', () => {
     it('create date chart', async () => {
@@ -24,7 +24,7 @@ describe('TwitterChart', () => {
             new StaticTableRowType('Cases'),
             new AvgNTableRowType('Cases (Avg 7)', 1, 7),
             new GaussTableRowType('Cases (Avg 7, smooth)', 2, 1),
-            new LocalMinTableRowType('Minima', 3)
+            new LocalExtremaTableRowType('Minima', 3, LocalExtramaType.MIN)
         ])
         const rows = [
             [
@@ -91,7 +91,10 @@ describe('TwitterChart', () => {
         const table = new Table([
             new DateTableRowType('Date'),
             new StaticTableRowType('Cases'),
-            new AvgNTableRowType('Cases (Avg 7)', 1, 7)
+            new AvgNTableRowType('Cases (Avg 7)', 1, 7),
+            new GaussTableRowType('Cases (Avg 7, smooth)', 2, 1),
+            new LocalExtremaTableRowType('Min', 3, LocalExtramaType.MIN),
+            new LocalExtremaTableRowType('Max', 3, LocalExtramaType.MAX)
         ])
         const rows = [
             [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
@@ -122,7 +125,32 @@ describe('TwitterChart', () => {
                 label: table.columnTitles[2],
                 color: [0, 0, 0, 1],
                 data: table.data[2]
-            }
+            },
+            {
+                axis: TwitterChartSeriesAxisType.y,
+                type: TwitterChartSeriesConfigType.line,
+                label: table.columnTitles[2],
+                color: [0, 0, 255, 1],
+                data: table.data[3]
+            },
+            {
+                axis: TwitterChartSeriesAxisType.x,
+                type: TwitterChartSeriesConfigType.label,
+                label: (rowIndex: number): string[] => {
+                    return ['Minimum', table.data[0][rowIndex]]
+                },
+                color: [0, 0, 255, .5],
+                data: table.data[4]
+            },
+            {
+                axis: TwitterChartSeriesAxisType.x,
+                type: TwitterChartSeriesConfigType.label,
+                label: (rowIndex: number): string[] => {
+                    return ['Maximum', table.data[0][rowIndex]]
+                },
+                color: [255, 0, 0, .5],
+                data: table.data[5]
+            },
         ]
         await twitterchart.save('./test/out/test2.png')
         looksSame('./test/out/expected2.png', './test/out/test2.png',

@@ -9,7 +9,7 @@ import {
     DiffTableRowType,
     FunctionalTableRowType,
     GaussTableRowType,
-    LocalMinTableRowType,
+    LocalExtremaTableRowType,
     LoessTableRowType,
     SumNTableRowType,
     SumTableRowType
@@ -19,7 +19,7 @@ import { AvgTableFunction } from './avgTableFunction.js'
 import { AvgNTableFunction } from './avgNTableFunction.js'
 import { DiffTableFunction } from './diffTableFunction.js'
 import { GaussTableFunction } from './gaussTableFunction.js'
-import { LocalMinTableFunction } from './localMinTableFunction.js'
+import { LocalExtramaType, LocalExtremaTableFunction } from './localExtremaTableFunction.js'
 
 export class TableFunctionFactory {
     static getFunction(
@@ -41,8 +41,8 @@ export class TableFunctionFactory {
                     sumNTableRowType.n
                 )
             case LoessTableRowType:
-                const loessTableRowType
-                    = functionalTableRowType as LoessTableRowType
+                const loessTableRowType =
+                    functionalTableRowType as LoessTableRowType
                 return new LoessTableFunction(
                     columnIndex,
                     loessTableRowType.sourceColumnIndex,
@@ -67,8 +67,8 @@ export class TableFunctionFactory {
                     functionalTableRowType.sourceColumnIndex
                 )
             case AvgNTableRowType:
-                const avgNTableRowType
-                    = functionalTableRowType as AvgNTableRowType
+                const avgNTableRowType =
+                    functionalTableRowType as AvgNTableRowType
                 return new AvgNTableFunction(
                     columnIndex,
                     avgNTableRowType.sourceColumnIndex,
@@ -79,10 +79,13 @@ export class TableFunctionFactory {
                     columnIndex,
                     functionalTableRowType.sourceColumnIndex
                 )
-            case LocalMinTableRowType:
-                return new LocalMinTableFunction(
+            case LocalExtremaTableRowType:
+                const localExtremaTableRowType =
+                    functionalTableRowType as LocalExtremaTableRowType
+                return new LocalExtremaTableFunction(
                     columnIndex,
-                    functionalTableRowType.sourceColumnIndex
+                    localExtremaTableRowType.sourceColumnIndex,
+                    localExtremaTableRowType.type
                 )
             default: throw new Error('Requested table function not defined.')
         }
