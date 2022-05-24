@@ -1,5 +1,5 @@
-import { Series } from './series.js'
-import { solve, GompertzParams } from './solver.js'
+import { Series } from '../series.js'
+import { solve, GompertzParams } from '../solver.js'
 import { Slice } from './slice.js'
 
 function gompertzDerivative(

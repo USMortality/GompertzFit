@@ -1,8 +1,8 @@
 import { ChartConfiguration } from 'chart.js'
 import { ChartJSNodeCanvas } from 'chartjs-node-canvas'
-import { dateString } from './common.js'
+import { dateString } from '../common.js'
 
-import { Series } from './series.js'
+import { Series } from '../series.js'
 import { Slice } from './slice.js'
 
 export function makeLines(

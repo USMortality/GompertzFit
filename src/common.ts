@@ -4,7 +4,7 @@ import { createWriteStream } from 'fs'
 import { pipeline } from 'stream'
 import fetch from 'node-fetch'
 
-import { Slice } from './slice.js'
+import { Slice } from './old/slice.js'
 
 // tslint:disable-next-line: no-unnecessary-initializer
 export function fillerArray(end: number, filler: any = undefined): number[] {

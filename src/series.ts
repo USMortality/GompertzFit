@@ -2,7 +2,7 @@ import { getSmoothedArrayMulti } from 'gauss-window'
 import lowess from '@stdlib/stats-lowess'
 
 import { fillerArray, fillerDateArray, getNumberLength, loadJson } from './common.js'
-import { Slice } from './slice.js'
+import { Slice } from './old/slice.js'
 import { Row } from './dataLoader.js'
 
 const SMOOTHING = 15

@@ -23,7 +23,13 @@ export abstract class FunctionalTableRowType extends TableRowType {
 }
 
 // tslint:disable-next-line: max-classes-per-file
-export class AutoIncrementTableRowType extends FunctionalTableRowType { }
+export class AutoIncrementTableRowType extends FunctionalTableRowType {
+    extraRows: number
+    constructor(title: string, extraRows: number = 0) {
+        super(title)
+        this.extraRows = extraRows
+    }
+}
 
 // tslint:disable-next-line: max-classes-per-file
 export class SumTableRowType extends FunctionalTableRowType { }

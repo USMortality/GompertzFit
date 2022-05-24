@@ -1,12 +1,12 @@
 import { ChartConfig, makeChart, makeLines } from './chart.js'
-import { Series } from './series.js'
+import { Series } from './../series.js'
 import { Gompertz } from './gompertz.js'
 import {
     fillerArray, getNameFromKey, loadJson, loadSlices, saveImage
-} from './common.js'
+} from './../common.js'
 import { Slice } from './slice.js'
 import { JobClient, JobConfig } from './jobClient.js'
-import { DataLoader, Row } from './dataLoader.js'
+import { DataLoader, Row } from './../dataLoader.js'
 
 const ADDITIONAL_DAYS = 90
 const Y_SCALE_FACTOR = 2

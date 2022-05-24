@@ -21,7 +21,7 @@ import { AvgTableFunction } from './avgTableFunction.js'
 import { AvgNTableFunction } from './avgNTableFunction.js'
 import { DiffTableFunction } from './diffTableFunction.js'
 import { GaussTableFunction } from './gaussTableFunction.js'
-import { LocalExtramaType, LocalExtremaTableFunction } from './localExtremaTableFunction.js'
+import { LocalExtremaTableFunction } from './localExtremaTableFunction.js'
 import { GompertzTableFunction } from './gompertzTableFunction.js'
 import { ArithmeticTableFunction } from './arithmeticTableFunction.js'
 
@@ -61,9 +61,10 @@ export class TableFunctionFactory {
                     gaussTableRowType.iterations
                 )
             case AutoIncrementTableRowType:
+                const autoIncrementTableRowType
+                    = functionalTableRowType as AutoIncrementTableRowType
                 return new AutoIncrementTableFunction(
-                    columnIndex,
-                    functionalTableRowType.sourceColumnIndex
+                    autoIncrementTableRowType.extraRows
                 )
             case AvgTableRowType:
                 return new AvgTableFunction(
