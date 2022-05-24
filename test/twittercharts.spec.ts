@@ -15,7 +15,6 @@ import {
     StaticTableRowType
 } from '../src/table/tableRowType'
 import { LocalExtramaType } from '../src/table/localExtremaTableFunction'
-import { dateString } from '../src/common'
 
 describe('TwitterChart', () => {
     it('create date chart', async () => {
@@ -45,7 +44,7 @@ describe('TwitterChart', () => {
             ],
             [70, 30, 78, 81, 66, 43, 31, 48, 93, 56, 91, 25, 19, 17,],
         ]
-        table.insertRows(rows)
+        table.insertRows(rows, true)
 
         const twitterchart = new TwitterChart(
             'Title', 'Subtitle', 'X-axis', 'Y-axis', 0
@@ -56,6 +55,7 @@ describe('TwitterChart', () => {
                 type: TwitterChartSeriesConfigType.dot,
                 label: table.columnTitles[0],
                 color: [0, 0, 0, 1],
+                isDashed: false,
                 data: table.data[0]
             },
             {
@@ -63,6 +63,7 @@ describe('TwitterChart', () => {
                 type: TwitterChartSeriesConfigType.dot,
                 label: table.columnTitles[1],
                 color: [0, 0, 200, 1],
+                isDashed: false,
                 data: table.data[1]
             },
             {
@@ -70,6 +71,7 @@ describe('TwitterChart', () => {
                 type: TwitterChartSeriesConfigType.line,
                 label: table.columnTitles[2],
                 color: [0, 0, 0, 1],
+                isDashed: false,
                 data: table.data[2]
             },
             {
@@ -77,6 +79,7 @@ describe('TwitterChart', () => {
                 type: TwitterChartSeriesConfigType.label,
                 label: 'Minimum',
                 color: [0, 0, 0, 1],
+                isDashed: false,
                 data: table.data[4]
             },
         ]
@@ -100,7 +103,7 @@ describe('TwitterChart', () => {
             [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
             [70, 30, 78, 81, 66, 43, 31, 48, 93, 56, 91, 25, 19, 17,],
         ]
-        table.insertRows(rows)
+        table.insertRows(rows, true)
         const twitterchart = new TwitterChart(
             'Title', 'Subtitle', 'X-axis', 'Y-axis', 0
         )
@@ -110,6 +113,7 @@ describe('TwitterChart', () => {
                 type: TwitterChartSeriesConfigType.dot,
                 label: table.columnTitles[0],
                 color: [0, 0, 0, 1],
+                isDashed: false,
                 data: table.data[0]
             },
             {
@@ -117,6 +121,7 @@ describe('TwitterChart', () => {
                 type: TwitterChartSeriesConfigType.dot,
                 label: table.columnTitles[1],
                 color: [0, 0, 200, 1],
+                isDashed: false,
                 data: table.data[1]
             },
             {
@@ -124,13 +129,15 @@ describe('TwitterChart', () => {
                 type: TwitterChartSeriesConfigType.line,
                 label: table.columnTitles[2],
                 color: [0, 0, 0, 1],
+                isDashed: false,
                 data: table.data[2]
             },
             {
                 axis: TwitterChartSeriesAxisType.y,
                 type: TwitterChartSeriesConfigType.line,
-                label: table.columnTitles[2],
+                label: table.columnTitles[3],
                 color: [0, 0, 255, 1],
+                isDashed: true,
                 data: table.data[3]
             },
             {
@@ -140,6 +147,7 @@ describe('TwitterChart', () => {
                     return ['Minimum', table.data[0][rowIndex]]
                 },
                 color: [0, 0, 255, .5],
+                isDashed: false,
                 data: table.data[4]
             },
             {
@@ -149,6 +157,7 @@ describe('TwitterChart', () => {
                     return ['Maximum', table.data[0][rowIndex]]
                 },
                 color: [255, 0, 0, .5],
+                isDashed: false,
                 data: table.data[5]
             },
         ]

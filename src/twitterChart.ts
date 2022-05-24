@@ -10,13 +10,14 @@ export type TwitterChartSeries = {
     type: TwitterChartSeriesConfigType,
     label: string | ((rowIndex: number) => string[]),
     color: number[],
+    isDashed: boolean,
     data?: any[]
 }
 const line = {
     type: 'line',
     xMin: 60,
     xMax: 60,
-    borderColor: 'rgb(255, 0, 0)',
+    borderColor: 'rgb(0, 0, 0)',
     borderWidth: 1,
     borderDash: [0, 0],
     label: {
@@ -78,7 +79,6 @@ export class TwitterChart {
                     if (row > 0) {
                         line.xMin = i
                         line.xMax = i
-                        line.borderDash = [4, 4]
                         line.borderColor = `rgb(${data.color.join(',')})`
                         line.label.enabled = true
                         line.label.content = this.getLineLabel(data.label, i)
@@ -108,6 +108,7 @@ export class TwitterChart {
                 borderColor: `rgba(${data.color.join(',')})`,
                 backgroundColor: `rgba(${data.color.join(',')})`,
                 fill: false,
+                borderDash: data.isDashed ? [4, 4] : [0, 0],
                 borderWidth: data.type === TwitterChartSeriesConfigType.dot ?
                     0 : 2,
                 pointRadius: data.type === TwitterChartSeriesConfigType.dot ?

@@ -1,3 +1,4 @@
+import { ArithmeticFunction, ArithmeticTableFunction } from './arithmeticTableFunction'
 import { LocalExtramaType } from './localExtremaTableFunction'
 export abstract class TableRowType {
     title: string
@@ -87,5 +88,38 @@ export class LocalExtremaTableRowType extends FunctionalTableRowType {
     ) {
         super(title, sourceColumnIndex)
         this.type = type
+    }
+}
+
+// tslint:disable-next-line: max-classes-per-file
+export class GompertzTableRowType extends FunctionalTableRowType {
+    tColumnIndex: number
+    constructor(
+        title: string,
+        sourceColumnIndex: number,
+        tColumnIndex: number
+    ) {
+        super(title, sourceColumnIndex)
+        this.tColumnIndex = tColumnIndex
+    }
+}
+
+// tslint:disable-next-line: max-classes-per-file
+export class ArithmeticTableRowType extends FunctionalTableRowType {
+    arithmeticFunction: ArithmeticFunction
+    termColumnIndex: number
+    termRowIndex: number
+
+    constructor(
+        title: string,
+        sourceColumnIndex: number,
+        arithmeticFunction: ArithmeticFunction,
+        termColumnIndex: number,
+        termRowIndex: number
+    ) {
+        super(title, sourceColumnIndex)
+        this.arithmeticFunction = arithmeticFunction
+        this.termColumnIndex = termColumnIndex
+        this.termRowIndex = termRowIndex
     }
 }

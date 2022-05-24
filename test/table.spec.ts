@@ -1,3 +1,5 @@
+import { ArithmeticFunction } from './../src/table/arithmeticTableFunction'
+import { ArithmeticTableRowType } from './../src/table/tableRowType'
 import { LocalExtramaType } from './../src/table/localExtremaTableFunction'
 import {
     AutoIncrementTableRowType,
@@ -209,6 +211,22 @@ describe('table', () => {
 
         expect(table.data[2]).to.eql(
             [0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0]
+        )
+    })
+
+    it('arithmeticFunction, max', () => {
+        const table = new Table(
+            [
+                new StaticTableRowType('t'),
+                new StaticTableRowType('Cases'),
+                new ArithmeticTableRowType('Cases -BG', 0,
+                    ArithmeticFunction.SUB, 0, 0)
+            ]
+        )
+        table.insertRows(rows)
+
+        expect(table.data[2]).to.eql(
+            [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
         )
     })
 

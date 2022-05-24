@@ -3,12 +3,14 @@ import { TableFunction } from './basicTableFunction.js'
 import { SumTableFunction } from './sumTableFunction.js'
 import { SumNTableFunction } from './sumNTableFunction.js'
 import {
+    ArithmeticTableRowType,
     AutoIncrementTableRowType,
     AvgNTableRowType,
     AvgTableRowType,
     DiffTableRowType,
     FunctionalTableRowType,
     GaussTableRowType,
+    GompertzTableRowType,
     LocalExtremaTableRowType,
     LoessTableRowType,
     SumNTableRowType,
@@ -20,6 +22,8 @@ import { AvgNTableFunction } from './avgNTableFunction.js'
 import { DiffTableFunction } from './diffTableFunction.js'
 import { GaussTableFunction } from './gaussTableFunction.js'
 import { LocalExtramaType, LocalExtremaTableFunction } from './localExtremaTableFunction.js'
+import { GompertzTableFunction } from './gompertzTableFunction.js'
+import { ArithmeticTableFunction } from './arithmeticTableFunction.js'
 
 export class TableFunctionFactory {
     static getFunction(
@@ -86,6 +90,24 @@ export class TableFunctionFactory {
                     columnIndex,
                     localExtremaTableRowType.sourceColumnIndex,
                     localExtremaTableRowType.type
+                )
+            case GompertzTableRowType:
+                const gompertzTableRowType =
+                    functionalTableRowType as GompertzTableRowType
+                return new GompertzTableFunction(
+                    columnIndex,
+                    gompertzTableRowType.sourceColumnIndex,
+                    gompertzTableRowType.tColumnIndex
+                )
+            case ArithmeticTableRowType:
+                const addTableRowType =
+                    functionalTableRowType as ArithmeticTableRowType
+                return new ArithmeticTableFunction(
+                    columnIndex,
+                    addTableRowType.sourceColumnIndex,
+                    addTableRowType.arithmeticFunction,
+                    addTableRowType.termColumnIndex,
+                    addTableRowType.termRowIndex,
                 )
             default: throw new Error('Requested table function not defined.')
         }

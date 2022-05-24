@@ -12,7 +12,9 @@ import {
     DiffTableRowType,
     StaticTableRowType,
     GaussTableRowType,
-    LocalExtremaTableRowType
+    LocalExtremaTableRowType,
+    GompertzTableRowType,
+    ArithmeticTableRowType
 } from './table/tableRowType.js'
 import {
     dateString,
@@ -20,6 +22,7 @@ import {
     getNameFromKey,
     zeroPad
 } from './common.js'
+import { ArithmeticFunction } from './table/arithmeticTableFunction.js'
 
 class Runner {
     jurisdiction = 'united_states'
@@ -36,10 +39,6 @@ class Runner {
             new LocalExtremaTableRowType('Max', 5, LocalExtramaType.MAX) // 7
         ]
     )
-    sliceTable: Table = new Table([
-        new StaticTableRowType('Date'), // 0
-        new StaticTableRowType('Cases (7d AVG)'), // 1
-    ])
 
     async loadData(): Promise<void> {
         console.log('Loading dataset...')
@@ -60,25 +59,29 @@ class Runner {
                 axis: TwitterChartSeriesAxisType.x,
                 type: TwitterChartSeriesConfigType.dot,
                 label: this.table.columnTitles[0],
-                color: [0, 0, 0, 1]
+                color: [0, 0, 0, 1],
+                isDashed: false,
             },
             {
                 axis: TwitterChartSeriesAxisType.y,
                 type: TwitterChartSeriesConfigType.line,
                 label: this.table.columnTitles[5],
-                color: [0, 0, 0, 1]
+                color: [0, 0, 0, 1],
+                isDashed: false,
             },
             {
                 axis: TwitterChartSeriesAxisType.y,
                 type: TwitterChartSeriesConfigType.line,
                 label: this.table.columnTitles[4],
-                color: [0, 200, 0, 0.67]
+                color: [0, 200, 0, 0.67],
+                isDashed: false,
             },
             {
                 axis: TwitterChartSeriesAxisType.y,
                 type: TwitterChartSeriesConfigType.dot,
                 label: this.table.columnTitles[3],
-                color: [0, 0, 255, 0.33]
+                color: [0, 0, 255, 0.33],
+                isDashed: false,
             },
             {
                 axis: TwitterChartSeriesAxisType.x,
@@ -87,6 +90,7 @@ class Runner {
                     return ['Minimum', dateString(this.table.data[0][rowIndex])]
                 },
                 color: [0, 0, 255, 1],
+                isDashed: false,
             },
             {
                 axis: TwitterChartSeriesAxisType.x,
@@ -95,6 +99,7 @@ class Runner {
                     return ['Maximum', dateString(this.table.data[0][rowIndex])]
                 },
                 color: [255, 0, 0, 1],
+                isDashed: false,
             },
         ]
 
@@ -110,40 +115,79 @@ class Runner {
             chart.data[4].data = this.table.data[6]
             chart.data[5].data = this.table.data[7]
 
-            const lastT = this.table.data[2][this.table.data[2].length - 1]
-            await chart.save(`./out/test/${this.jurisdiction}/${zeroPad(lastT, 3)}.png`)
+            const lastT = zeroPad(
+                this.table.data[2][this.table.data[2].length - 1],
+                3
+            )
+            // await chart.save(`./out/test/${this.jurisdiction}/${lastT}.png`)
         }
     }
 
-    async makeSliceChart(sliceIndex: number, slice: any[][]): Promise<void> {
+    async makeSliceChart(slice: any[][]): Promise<void> {
         const chart = new TwitterChart(
             `COVID-19 Cases - Latest Wave [${getNameFromKey(this.jurisdiction)}]`,
             'Source: OWID; Created by @USMortality',
             'Day',
             'COVID-19 Cases'
         )
+
+        const sliceTable: Table = new Table([
+            new StaticTableRowType('Date'), // 0
+            new StaticTableRowType('Cases (7d AVG)'), // 1
+            new GaussTableRowType('Cases (7d AVG, smooth)', 1, 100), // 2
+            new AutoIncrementTableRowType('Day'), // 3
+            new ArithmeticTableRowType('Cases (7d AVG) - Background',
+                2, ArithmeticFunction.SUB, 2, 0), // 4
+            new GompertzTableRowType('Gompertz', 4, 3), // 5
+            new ArithmeticTableRowType('Gompertz Prediction',
+                5, ArithmeticFunction.ADD, 2, 0), // 6
+        ])
+
+        // fillerDateArray(slice[0][slice[0].length - 1], 120)
+        const date = slice[0]
+        sliceTable.insertRows([date, slice[4]])
+        sliceTable.print()
+
         const chartConfig = [
             {
                 axis: TwitterChartSeriesAxisType.x,
                 type: TwitterChartSeriesConfigType.dot,
-                label: this.table.columnTitles[0],
-                color: [0, 0, 0, 1]
+                label: sliceTable.columnTitles[0],
+                color: [0, 0, 0, 1],
+                isDashed: false,
+                data: fillerDateArray(
+                    sliceTable.data[0][sliceTable.data[0].length - 1],
+                    120
+                )
             },
             {
                 axis: TwitterChartSeriesAxisType.y,
                 type: TwitterChartSeriesConfigType.line,
-                label: this.table.columnTitles[5],
-                color: [0, 0, 0, 1]
+                label: sliceTable.columnTitles[6],
+                color: [255, 0, 255, 1],
+                isDashed: true,
+                data: sliceTable.data[6]
+            },
+            {
+                axis: TwitterChartSeriesAxisType.y,
+                type: TwitterChartSeriesConfigType.line,
+                label: sliceTable.columnTitles[2],
+                color: [0, 0, 0, 1],
+                isDashed: false,
+                data: sliceTable.data[2]
+            },
+            {
+                axis: TwitterChartSeriesAxisType.y,
+                type: TwitterChartSeriesConfigType.line,
+                label: sliceTable.columnTitles[1],
+                color: [0, 200, 0, 0.67],
+                isDashed: false,
+                data: sliceTable.data[1]
             },
         ]
 
-        const date = fillerDateArray(slice[0][slice[0].length - 1], 120)
-        this.sliceTable.insertRows([date, slice[4]])
-
+        // Extend x-axis by 90 days
         chart.data = chartConfig
-        chart.data[0].data = this.sliceTable.data[0]
-        chart.data[1].data = this.sliceTable.data[1]
-
         await chart.save(`./out/test/${this.jurisdiction}/_latest.png`)
     }
 
@@ -156,7 +200,7 @@ class Runner {
         const sliceData = this.table.splitAt(6, 1)
         const sliceIndex = sliceData.length - 1
         const lastSlice = sliceData[sliceIndex]
-        await this.makeSliceChart(sliceIndex, lastSlice)
+        await this.makeSliceChart(lastSlice)
 
         console.log('Processing data finished.')
     }

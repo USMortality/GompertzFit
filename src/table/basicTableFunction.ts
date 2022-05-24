@@ -6,11 +6,15 @@ export abstract class BasicTableFunction implements TableFunction {
     columnIndex: number
     sourceColumnIndex: number
 
-    constructor(columnIndex: number, sourceColumnIndex: number) {
+    constructor(
+        columnIndex: number,
+        sourceColumnIndex: number
+    ) {
         this.columnIndex = columnIndex
         this.sourceColumnIndex = sourceColumnIndex
     }
 
+    // TODO: Remove `number` type, not stable with e.g. gauss functions.
     abstract calculate(data: any[][]): number | number[]
 
     lastTargetElement(data: any[][]): number {

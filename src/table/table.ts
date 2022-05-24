@@ -24,13 +24,13 @@ export class Table {
         }
     }
 
-    insertRow(row: any[]): void {
+    insertRow(row: any[], recalculate: boolean = true): void {
         assert(row.length === this.staticColumnLength(), 'insertRow')
         for (let i = 0; i < row.length; i++) this.data[i].push(row[i])
-        this.recalculateDataFunctions()
+        if (recalculate) this.recalculateDataFunctions()
     }
 
-    insertRows(data: any[][]): void {
+    insertRows(data: any[][], recalculate: boolean = true): void {
         assert(data.length === this.staticColumnLength())
 
         for (let rowIndex = 0; rowIndex < data[0].length; rowIndex++) {
@@ -40,8 +40,9 @@ export class Table {
                     result.push(data[colIndex][rowIndex])
                 }
             }
-            this.insertRow(result)
+            this.insertRow(result, recalculate)
         }
+        if (!recalculate) this.recalculateDataFunctions()
     }
 
     getRowAt(rowIndex: number): any[] {
