@@ -1,9 +1,14 @@
+import { fillerArray } from '../common.js'
 import { BasicTableFunction } from './basicTableFunction.js'
 
 export class DiffTableFunction extends BasicTableFunction {
-    override calculate(data: any[][]): number {
-        const sourceRow = this.sourceColumn(data)
-        if (sourceRow.length < 2) return 0
-        return sourceRow[sourceRow.length - 1] - sourceRow[sourceRow.length - 2]
+    override calculate(data: any[][]): number[] {
+        const result = [0]
+        const columnData = this.sourceColumn(data)
+
+        for (let i = 1; i < columnData.length; i++) {
+            result.push(columnData[i] - columnData[i - 1])
+        }
+        return result
     }
 }

@@ -8,13 +8,20 @@ export class SumNTableFunction extends BasicTableFunction {
         this.n = n
     }
 
-    override calculate(data: any[][]): number {
+    override calculate(data: any[][]): number[] {
+        const result = []
         const columnData = this.sourceColumn(data)
-        const start = this.getStart(data, this.n)
-        let sum = 0
-        for (let i = start; i < columnData.length; i++) {
-            sum += columnData[i]
+        for (let i = 0; i < columnData.length; i++) {
+            if (i === 0) result.push(columnData[i])
+
+            const start = this.getStart(data, this.n)
+            let sum = 0
+            for (let j = start; j < columnData.length; j++) {
+                sum += columnData[j]
+            }
+
+            result.push(sum)
         }
-        return sum
+        return result
     }
 }

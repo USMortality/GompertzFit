@@ -1,4 +1,4 @@
-import { DataLoader, Row } from './../src/dataLoader'
+import { DataLoader, Row } from './../src/dataLoader.js'
 import { deepEqual } from 'assert'
 import { expect } from 'chai'
 import 'jest'

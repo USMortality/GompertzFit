@@ -14,8 +14,7 @@ export abstract class BasicTableFunction implements TableFunction {
         this.sourceColumnIndex = sourceColumnIndex
     }
 
-    // TODO: Remove `number` type, not stable with e.g. gauss functions.
-    abstract calculate(data: any[][]): number | number[]
+    abstract calculate(data: any[][]): number[]
 
     lastTargetElement(data: any[][]): number {
         const targetRow = this.targetColumn(data)

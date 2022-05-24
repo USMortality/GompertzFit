@@ -30,7 +30,7 @@ export class Table {
         if (recalculate) this.recalculateDataFunctions()
     }
 
-    insertRows(data: any[][], recalculate: boolean = true): void {
+    insertRows(data: any[][]): void {
         assert(data.length === this.staticColumnLength())
 
         for (let rowIndex = 0; rowIndex < data[0].length; rowIndex++) {
@@ -40,9 +40,9 @@ export class Table {
                     result.push(data[colIndex][rowIndex])
                 }
             }
-            this.insertRow(result, recalculate)
+            this.insertRow(result, false)
         }
-        if (!recalculate) this.recalculateDataFunctions()
+        this.recalculateDataFunctions()
     }
 
     getRowAt(rowIndex: number): any[] {

@@ -1,6 +1,6 @@
-import { ArithmeticFunction } from './../src/table/arithmeticTableFunction'
-import { ArithmeticTableRowType } from './../src/table/tableRowType'
-import { LocalExtramaType } from './../src/table/localExtremaTableFunction'
+import { ArithmeticFunction } from './../src/table/arithmeticTableFunction.js'
+import { ArithmeticTableRowType } from './../src/table/tableRowType.js'
+import { LocalExtramaType } from './../src/table/localExtremaTableFunction.js'
 import {
     AutoIncrementTableRowType,
     AvgNTableRowType,
@@ -112,9 +112,10 @@ describe('table', () => {
             ]
         )
         table.insertRows(rows)
+        table.print()
 
         expect(table.data[2][13]).to.equal(49.857142857142854)
-        expect(table.data[3][11]).to.equal(58.454514362392956)
+        expect(table.data[3][11]).to.equal(55.13355093120387)
     })
 
     it('gaussFunction', () => {

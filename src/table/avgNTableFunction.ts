@@ -8,11 +8,17 @@ export class AvgNTableFunction extends BasicTableFunction {
         this.n = n
     }
 
-    override calculate(data: any[][]): number {
+    override calculate(data: any[][]): number[] {
+        const result = []
         const columnData = this.sourceColumn(data)
-        const start = this.getStart(data, this.n)
-        let sum = 0
-        for (let i = start; i < columnData.length; i++) sum += columnData[i]
-        return sum / Math.min(columnData.length, this.n)
+        for (let i = 1; i <= columnData.length; i++) {
+            let sum = 0
+            const start = i < this.n ? 0 : i - this.n
+            for (let j = start; j < i; j++) {
+                sum += columnData[j]
+            }
+            result.push(sum / Math.min(i, this.n))
+        }
+        return result
     }
 }

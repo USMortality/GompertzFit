@@ -1,4 +1,5 @@
 import assert from 'assert'
+import { fillerArray } from '../common.js'
 import { BasicTableFunction } from './basicTableFunction.js'
 
 export enum LocalExtramaType { MIN, MAX }
@@ -15,10 +16,10 @@ export class LocalExtremaTableFunction extends BasicTableFunction {
         this.type = type
     }
 
-    override calculate(data: any[][]): number | number[] {
+    override calculate(data: any[][]): number[] {
         const sourceColumn = this.sourceColumn(data)
         const len = sourceColumn.length
-        if (len < 3) return 0
+        if (len < 3) return fillerArray(len, 0)
 
         const result = [0]
         for (let i = 2; i < sourceColumn.length; i++) {

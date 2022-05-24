@@ -123,6 +123,11 @@ class Runner {
         }
     }
 
+    getDateLabels(dateRow: any[], extraDays: number): Date[] {
+        const lastDate = dateRow[dateRow.length - 1]
+        return fillerDateArray(lastDate, extraDays)
+    }
+
     async makeSliceChart(slice: any[][]): Promise<void> {
         const chart = new TwitterChart(
             `COVID-19 Cases - Latest Wave [${getNameFromKey(this.jurisdiction)}]`,
@@ -131,11 +136,12 @@ class Runner {
             'COVID-19 Cases'
         )
 
+        const extraDays = 120
         const sliceTable: Table = new Table([
             new StaticTableRowType('Date'), // 0
             new StaticTableRowType('Cases (7d AVG)'), // 1
             new GaussTableRowType('Cases (7d AVG, smooth)', 1, 100), // 2
-            new AutoIncrementTableRowType('Day'), // 3
+            new AutoIncrementTableRowType('Day', extraDays), // 3
             new ArithmeticTableRowType('Cases (7d AVG) - Background',
                 2, ArithmeticFunction.SUB, 2, 0), // 4
             new GompertzTableRowType('Gompertz', 4, 3), // 5
@@ -143,9 +149,10 @@ class Runner {
                 5, ArithmeticFunction.ADD, 2, 0), // 6
         ])
 
-        // fillerDateArray(slice[0][slice[0].length - 1], 120)
-        const date = slice[0]
-        sliceTable.insertRows([date, slice[4]])
+        sliceTable.insertRows([
+            this.getDateLabels(slice[0], extraDays),
+            slice[4]
+        ])
         sliceTable.print()
 
         const chartConfig = [
@@ -155,10 +162,7 @@ class Runner {
                 label: sliceTable.columnTitles[0],
                 color: [0, 0, 0, 1],
                 isDashed: false,
-                data: fillerDateArray(
-                    sliceTable.data[0][sliceTable.data[0].length - 1],
-                    120
-                )
+                data: sliceTable.data[0]
             },
             {
                 axis: TwitterChartSeriesAxisType.y,
@@ -186,7 +190,6 @@ class Runner {
             },
         ]
 
-        // Extend x-axis by 90 days
         chart.data = chartConfig
         await chart.save(`./out/test/${this.jurisdiction}/_latest.png`)
     }

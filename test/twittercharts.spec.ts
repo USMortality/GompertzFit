@@ -1,9 +1,9 @@
-import { Table } from '../src/table/table'
+import { Table } from '../src/table/table.js'
 import {
     TwitterChart,
     TwitterChartSeriesAxisType,
     TwitterChartSeriesConfigType
-} from './../src/twitterChart'
+} from './../src/twitterChart.js'
 import { expect } from 'chai'
 import 'jest'
 import looksSame from 'looks-same'
@@ -13,8 +13,8 @@ import {
     GaussTableRowType,
     LocalExtremaTableRowType,
     StaticTableRowType
-} from '../src/table/tableRowType'
-import { LocalExtramaType } from '../src/table/localExtremaTableFunction'
+} from '../src/table/tableRowType.js'
+import { LocalExtramaType } from '../src/table/localExtremaTableFunction.js'
 
 describe('TwitterChart', () => {
     it('create date chart', async () => {
@@ -44,7 +44,7 @@ describe('TwitterChart', () => {
             ],
             [70, 30, 78, 81, 66, 43, 31, 48, 93, 56, 91, 25, 19, 17,],
         ]
-        table.insertRows(rows, true)
+        table.insertRows(rows)
 
         const twitterchart = new TwitterChart(
             'Title', 'Subtitle', 'X-axis', 'Y-axis', 0
@@ -103,7 +103,7 @@ describe('TwitterChart', () => {
             [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
             [70, 30, 78, 81, 66, 43, 31, 48, 93, 56, 91, 25, 19, 17,],
         ]
-        table.insertRows(rows, true)
+        table.insertRows(rows)
         const twitterchart = new TwitterChart(
             'Title', 'Subtitle', 'X-axis', 'Y-axis', 0
         )
