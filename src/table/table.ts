@@ -1,14 +1,14 @@
 import { TableFunction } from './basicTableFunction.js'
 import { assert } from 'console'
 import { TableFunctionFactory } from './tableFunctionFactory.js'
-import { FunctionalTableRowType, TableRowType } from './tableRowType.js'
+import { BasicFunctionalTableRowType, TableRowType } from './tableRowType.js'
 import os from 'os'
 import fs from 'fs'
 
 export class Table {
     columnTitles: string[] = []
     private tableRowTypes: TableRowType[] = []
-    private dataFunctionDefinitions: FunctionalTableRowType[] = []
+    private dataFunctionDefinitions: BasicFunctionalTableRowType[] = []
     public data: any[][] = []
 
     constructor(
@@ -17,7 +17,7 @@ export class Table {
         for (const rowType of tableRowTypes) {
             this.tableRowTypes.push(rowType)
             this.columnTitles.push(rowType.title)
-            if (rowType instanceof FunctionalTableRowType) {
+            if (rowType instanceof BasicFunctionalTableRowType) {
                 this.dataFunctionDefinitions.push(rowType)
             }
             this.data.push([])
@@ -25,19 +25,19 @@ export class Table {
     }
 
     insertRow(row: any[], recalculate: boolean = true): void {
-        assert(row.length === this.staticColumnLength(), 'insertRow')
         for (let i = 0; i < row.length; i++) this.data[i].push(row[i])
         if (recalculate) this.recalculateDataFunctions()
     }
 
     insertRows(data: any[][]): void {
-        assert(data.length === this.staticColumnLength())
+        assert(data.length === this.staticColumnLength(), 'insertRows')
 
         for (let rowIndex = 0; rowIndex < data[0].length; rowIndex++) {
             const result = []
             for (const colIndex in data) {
                 if (Object.prototype.hasOwnProperty.call(data, colIndex)) {
-                    result.push(data[colIndex][rowIndex])
+                    const value = data[colIndex][rowIndex]
+                    if (value !== undefined) result.push(value)
                 }
             }
             this.insertRow(result, false)
@@ -75,7 +75,7 @@ export class Table {
     }
 
     print(): void {
-        console.log(this.data)
+        console.log(JSON.stringify(this.data, null, 2))
     }
 
     saveCsv(filepath: string): void {
@@ -90,6 +90,15 @@ export class Table {
         fs.writeFile(filepath, result, (err) => {
             if (err) return console.log(err)
         })
+    }
+
+    extendColumn(columnIndex: number, extender: any[]): void {
+        Array.prototype.push.apply(this.data[columnIndex], extender)
+    }
+
+    reduceColumn(columnIndex: number, length: number): void {
+        const currLength = this.data[columnIndex].length
+        this.data[columnIndex].splice(currLength - length, length)
     }
 
     private recalculateDataFunctions(): void {

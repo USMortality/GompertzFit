@@ -81,6 +81,7 @@ export class TwitterChart {
                         line.xMax = i
                         line.borderColor = `rgb(${data.color.join(',')})`
                         line.label.enabled = true
+                        line.borderDash = data.isDashed ? [4, 6] : [0, 0]
                         line.label.content = this.getLineLabel(data.label, i)
                         labels.push(JSON.parse(JSON.stringify(line)))
                     }

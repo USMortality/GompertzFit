@@ -7,11 +7,11 @@
   "license": "ISC",
   "type": "module",
   "scripts": {
-    "build": "npx tsc",
+    "build": "rm -rf dist/* && npx tsc",
     "update": "node dist/src/download.js",
     "clean": "rm -rf ./out/*",
     "start": "node --max-old-space-size=2048 dist/src/main.js",
-    "watch": "npx tsc -w",
+    "watch": "npm run build && npx tsc -w",
     "test": "npx mocha",
     "test:coverage": "npx c8 npm test && npx c8 check-coverage --lines 70 --per-file"
   },
@@ -36,6 +36,7 @@
     "commander": "^9.2.0",
     "csvtojson": "^2.0.10",
     "gauss-window": "^1.1.0",
+    "ml-regression-simple-linear": "^2.0.3",
     "node-fetch": "^3.2.4",
     "progress": "^2.0.3",
     "redis": "^4.1.0"

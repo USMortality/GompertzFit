@@ -1,5 +1,5 @@
-import { ArithmeticFunction, ArithmeticTableFunction } from './arithmeticTableFunction'
-import { LocalExtramaType } from './localExtremaTableFunction'
+import { ArithmeticFunction } from './arithmeticTableFunction.js'
+import { LocalExtramaType } from './localExtremaTableFunction.js'
 export abstract class TableRowType {
     title: string
     constructor(title: string) {
@@ -14,16 +14,20 @@ export class StaticTableRowType extends TableRowType { }
 export class DateTableRowType extends StaticTableRowType { }
 
 // tslint:disable-next-line: max-classes-per-file
-export abstract class FunctionalTableRowType extends TableRowType {
+export abstract class BasicFunctionalTableRowType extends TableRowType { }
+
+// tslint:disable-next-line: max-classes-per-file
+export abstract class FunctionalTableRowType
+    extends BasicFunctionalTableRowType {
     sourceColumnIndex: number
-    constructor(title: string, sourceColumnIndex?: number) {
+    constructor(title: string, sourceColumnIndex: number) {
         super(title)
         this.sourceColumnIndex = sourceColumnIndex
     }
 }
 
 // tslint:disable-next-line: max-classes-per-file
-export class AutoIncrementTableRowType extends FunctionalTableRowType {
+export class AutoIncrementTableRowType extends BasicFunctionalTableRowType {
     extraRows: number
     constructor(title: string, extraRows: number = 0) {
         super(title)
@@ -127,5 +131,58 @@ export class ArithmeticTableRowType extends FunctionalTableRowType {
         this.arithmeticFunction = arithmeticFunction
         this.termColumnIndex = termColumnIndex
         this.termRowIndex = termRowIndex
+    }
+}
+
+// tslint:disable-next-line: max-classes-per-file
+export class GompertzJtTableRowType extends FunctionalTableRowType {
+    xColumnIndex: number
+    days: number
+    insertIntermediateResults: boolean
+    constructor(
+        title: string,
+        sourceColumnIndex: number,
+        xColumnIndex: number,
+        days: number,
+    ) {
+        super(title, sourceColumnIndex)
+        this.xColumnIndex = xColumnIndex
+        this.days = days
+    }
+}
+
+// tslint:disable-next-line: max-classes-per-file
+export class GompertzJtS1TableRowType extends FunctionalTableRowType { }
+
+// tslint:disable-next-line: max-classes-per-file
+export class GompertzJtS2TableRowType extends FunctionalTableRowType {
+    xColumnIndex: number
+    days: number
+    constructor(
+        title: string,
+        sourceColumnIndex: number,
+        xColumnIndex: number,
+        days: number,
+    ) {
+        super(title, sourceColumnIndex)
+        this.xColumnIndex = xColumnIndex
+        this.days = days
+    }
+}
+
+// tslint:disable-next-line: max-classes-per-file
+export class GompertzJtS3TableRowType extends FunctionalTableRowType {
+    xColumnIndex: number
+    s2ColumnIndex: number
+
+    constructor(
+        title: string,
+        sourceColumnIndex: number,
+        xColumnIndex: number,
+        s2ColumnIndex: number,
+    ) {
+        super(title, sourceColumnIndex)
+        this.xColumnIndex = xColumnIndex
+        this.s2ColumnIndex = s2ColumnIndex
     }
 }

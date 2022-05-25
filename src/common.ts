@@ -1,5 +1,4 @@
 import { readFile, writeFile } from 'fs'
-import { promisify } from 'node:util'
 import { createWriteStream } from 'fs'
 import { pipeline } from 'stream'
 import fetch from 'node-fetch'
@@ -16,7 +15,7 @@ export function fillerArray(end: number, filler: any = undefined): number[] {
 export function fillerDateArray(fromDate: Date, end: number): Date[] {
     const result = []
     const start = fromDate
-    for (let i = 0; i < end; i++) result.push(addDays(start, i))
+    for (let i = 0; i < end; i++) result.push(addDays(start, i + 1))
     return result
 }
 
@@ -35,9 +34,14 @@ export function addDays(date: Date, days: number): Date {
     return newDate
 }
 
-export function saveImage(image: Buffer, filename: string): Promise<void> {
-    const writeFileAsync = promisify(writeFile)
-    return writeFileAsync(filename, image, 'base64')
+export async function saveImage(image: Buffer, filename: string):
+    Promise<void> {
+    return new Promise((resolve) => {
+        writeFile(filename, image, 'base64', (err) => {
+            if (err) console.error(err)
+            resolve()
+        })
+    })
 }
 
 export function getNumberLength(val: number): number {
@@ -72,12 +76,16 @@ export function capitalizeFirstLetters(str: string): string {
 }
 
 export async function download(urlString: string, file: string): Promise<void> {
-    const streamPipeline = promisify(pipeline)
     const response = await fetch(urlString)
     if (!response.ok) {
         throw new Error(`unexpected response ${response.statusText}`)
     }
-    await streamPipeline(response.body, createWriteStream(file))
+    return new Promise((resolve) => {
+        pipeline(response.body, createWriteStream(file), (err) => {
+            if (err) console.error(err)
+            resolve()
+        })
+    })
 }
 
 export function dateString(date: Date): string {
@@ -91,4 +99,8 @@ export function zeroPad(num, places): string {
 export function printMemory(): void {
     const used = process.memoryUsage().heapUsed / 1024 / 1024
     console.log(`The script uses approximately ${Math.round(used * 100) / 100} MB`)
+}
+
+export function zeroIfNanOrInfinite(value: number): number {
+    return (isNaN(value) || !isFinite(value)) ? 0 : value
 }

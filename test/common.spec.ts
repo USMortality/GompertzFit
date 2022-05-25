@@ -27,8 +27,8 @@ describe('common.ts', () => {
             const date = new Date()
             const result = fillerDateArray(date, 2)
             expect(result.length).to.equal(2)
-            deepEqual(result[0], date)
-            deepEqual(result[1], addDays(date, 1))
+            deepEqual(result[0], addDays(date, 1))
+            deepEqual(result[1], addDays(date, 2))
         })
     })
     describe('getKey', () => {

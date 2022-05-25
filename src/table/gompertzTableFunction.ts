@@ -15,6 +15,7 @@ export class GompertzTableFunction extends BasicTableFunction {
 
     override calculate(data: any[][]): number[] {
         const result = []
+        // console.log(data[this.sourceColumnIndex])
         const config: GompertzParams = solve(
             data[this.sourceColumnIndex], this.gompertzDerivative
         )

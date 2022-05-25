@@ -12,7 +12,10 @@ export class SumNTableFunction extends BasicTableFunction {
         const result = []
         const columnData = this.sourceColumn(data)
         for (let i = 0; i < columnData.length; i++) {
-            if (i === 0) result.push(columnData[i])
+            if (i === 0) {
+                result.push(columnData[i])
+                continue
+            }
 
             const start = this.getStart(data, this.n)
             let sum = 0

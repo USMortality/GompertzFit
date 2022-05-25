@@ -147,7 +147,7 @@ describe('TwitterChart', () => {
                     return ['Minimum', table.data[0][rowIndex]]
                 },
                 color: [0, 0, 255, .5],
-                isDashed: false,
+                isDashed: true,
                 data: table.data[4]
             },
             {
@@ -157,7 +157,7 @@ describe('TwitterChart', () => {
                     return ['Maximum', table.data[0][rowIndex]]
                 },
                 color: [255, 0, 0, .5],
-                isDashed: false,
+                isDashed: true,
                 data: table.data[5]
             },
         ]
