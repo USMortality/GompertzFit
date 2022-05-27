@@ -485,10 +485,10 @@ describe('table', () => {
             [
                 new StaticTableRowType('t'), // 0
                 new StaticTableRowType('cases cumulative'), // 1
-                new GompertzJtS1TableRowType('Growth Line', 1), // 2
-                new AutoIncrementTableRowType('x', 7), // 3
-                new GompertzJtS2TableRowType('Growth Line Trend', 2, 3, 7), // 4
-                new GompertzJtS3TableRowType('Prediction Total', 1, 3, 4) // 5
+                new AutoIncrementTableRowType('x', 7), // 2
+                new GompertzJtS1TableRowType('Growth Line', 1), // 3
+                new GompertzJtS2TableRowType('Growth Line Trend', 3, 2, 7), // 4
+                new GompertzJtS3TableRowType('Prediction Total', 1, 2, 4) // 5
             ]
         )
         table.insertRows([

@@ -17,7 +17,10 @@ import {
     GompertzTableRowType,
     ArithmeticTableRowType,
     SumTableRowType,
-    GompertzJtTableRowType,
+    GompertzJtS1TableRowType,
+    GompertzJtS2TableRowType,
+    GompertzJtS3TableRowType,
+    LoessTableRowType,
 } from './table/tableRowType.js'
 import {
     dateString,
@@ -140,7 +143,7 @@ class Runner {
 
     private updateSliceChartData(chart: TwitterChart, data: any[][]): void {
         chart.data[0].data = data[0]
-        chart.data[1].data = data[8]
+        chart.data[1].data = data[10]
         chart.data[2].data = data[2]
         chart.data[3].data = data[1]
     }
@@ -219,15 +222,18 @@ class Runner {
             new StaticTableRowType('Date'), // 0
             new StaticTableRowType('Cases (7d AVG)'), // 1
             new GaussTableRowType('Cases (7d AVG, smooth)', 1, 100), // 2
+            // new LoessTableRowType('Cases (7d AVG, smooth, loess)', 1, 100), // 2
             new AutoIncrementTableRowType('Day', this.extraDays), // 3
             new ArithmeticTableRowType('Cases (7d AVG) - Background',
                 2, ArithmeticFunction.SUB, 2, 0), // 4
             new SumTableRowType('Reconstitute Total, X(t)', 4), // 5
-            new GompertzJtTableRowType('log[Exp. Grow. Factor], Trend',
-                5, 3, 14),
-            new DiffTableRowType('Cases Prediction - Background', 6), // 7
-            new ArithmeticTableRowType('Cases Prediction', 7,
-                ArithmeticFunction.ADD, 2, 0) // 8
+            new GompertzJtS1TableRowType('log[Exp. Grow. Factor]', 5), // 6
+            new GompertzJtS2TableRowType('log[Exp. Grow. Factor] 14d Trend',
+                6, 3, 14), // 7
+            new GompertzJtS3TableRowType('Prediction Total', 5, 3, 7), // 8
+            new DiffTableRowType('Cases Prediction - Background', 8), // 9
+            new ArithmeticTableRowType('Cases Prediction', 9,
+                ArithmeticFunction.ADD, 2, 0) // 10
         ])
 
         const chart = new TwitterChart(
@@ -247,8 +253,8 @@ class Runner {
             {
                 axis: TwitterChartSeriesAxisType.y,
                 type: TwitterChartSeriesConfigType.line,
-                label: sliceTable.columnTitles[6],
-                color: [255, 0, 255, 1],
+                label: sliceTable.columnTitles[10],
+                color: [0, 0, 0, 1],
                 isDashed: true,
             },
             {
@@ -261,7 +267,7 @@ class Runner {
             {
                 axis: TwitterChartSeriesAxisType.y,
                 type: TwitterChartSeriesConfigType.line,
-                label: sliceTable.columnTitles[8],
+                label: sliceTable.columnTitles[1],
                 color: [0, 200, 0, 0.67],
                 isDashed: false,
             },
@@ -270,12 +276,10 @@ class Runner {
         const data = [this.getDateLabels(slice[0], this.extraDays), slice[4]]
         for (let i = 0; i < data[1].length; i++) {
             console.log(`Processing ${data[0][i]}`)
-            if (i === 20) console.log('a')
             sliceTable.insertRow([data[0][i], data[1][i]])
 
             const extraDates = fillerDateArray(data[0][i], this.extraDays)
             sliceTable.extendColumn(0, extraDates)
-            sliceTable.print()
 
             const chartData = sliceTable.data
             this.updateSliceChartData(chart, chartData)
@@ -290,7 +294,7 @@ class Runner {
         const movie = `./out/${this.folder}/${this.jurisdiction}.mp4`
         execSync(`rm -rf ${movie}`)
         execSync(
-            `ffmpeg -hide_banner -loglevel error -r 30 -pattern_type glob -i './out/` +
+            `ffmpeg -hide_banner -loglevel error -r 1 -pattern_type glob -i './out/` +
             `${this.folder}/${this.jurisdiction}/*.png' -c:v libx264 -vf "fps=30,format=yuv420p,scale` +
             `=1200x670" ${movie}`
         )
@@ -307,7 +311,7 @@ class Runner {
         const lastSlice = sliceData[sliceIndex]
         await this.makeSliceChart2(sliceIndex, lastSlice)
 
-        // await this.makeMovie()
+        await this.makeMovie()
 
         console.log('Processing data finished.')
     }

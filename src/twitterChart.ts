@@ -3,7 +3,7 @@ import { ChartJSNodeCanvas } from 'chartjs-node-canvas'
 import { promisify } from 'node:util'
 import { writeFile } from 'fs'
 
-export enum TwitterChartSeriesAxisType { x, y }
+export enum TwitterChartSeriesAxisType { x, y, y2 }
 export enum TwitterChartSeriesConfigType { dot, line, label }
 export type TwitterChartSeries = {
     axis: TwitterChartSeriesAxisType,
@@ -104,6 +104,7 @@ export class TwitterChart {
         for (const data of this.data) {
             if (data.axis === TwitterChartSeriesAxisType.x) continue
             datasets.push({
+                yAxisID: (data.axis === TwitterChartSeriesAxisType.y) ? 'y' : 'y2',
                 label: data.label,
                 data: data.data,
                 borderColor: `rgba(${data.color.join(',')})`,
@@ -201,7 +202,32 @@ export class TwitterChart {
                         }
                     },
                     y: {
-                        min: 0,
+                        type: 'linear',
+                        position: 'left',
+                        // min: 0,
+                        // max: chartConfig.yMax,
+                        title: {
+                            display: true,
+                            text: this.yTitle,
+                            font: {
+                                weight: '200',
+                                size: 11
+                            },
+                            color: 'rgba(120, 120, 120, 100%)',
+                        },
+                        ticks: {
+                            font: {
+                                weight: '200',
+                                size: 10
+                            },
+                            color: 'rgba(0, 0, 0, 100%)',
+                        }
+                    },
+                    y2: {
+                        type: 'logarithmic',
+                        position: 'right',
+                        display: 'auto',
+                        // min: 0,
                         // max: chartConfig.yMax,
                         title: {
                             display: true,
@@ -224,6 +250,7 @@ export class TwitterChart {
             },
             plugins: [],
         }
+        // console.log(JSON.stringify(configuration, null, 2))
         return await this.chartJSNodeCanvas.renderToBuffer(configuration)
     }
 

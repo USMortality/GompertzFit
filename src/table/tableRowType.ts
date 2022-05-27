@@ -135,23 +135,6 @@ export class ArithmeticTableRowType extends FunctionalTableRowType {
 }
 
 // tslint:disable-next-line: max-classes-per-file
-export class GompertzJtTableRowType extends FunctionalTableRowType {
-    xColumnIndex: number
-    days: number
-    insertIntermediateResults: boolean
-    constructor(
-        title: string,
-        sourceColumnIndex: number,
-        xColumnIndex: number,
-        days: number,
-    ) {
-        super(title, sourceColumnIndex)
-        this.xColumnIndex = xColumnIndex
-        this.days = days
-    }
-}
-
-// tslint:disable-next-line: max-classes-per-file
 export class GompertzJtS1TableRowType extends FunctionalTableRowType { }
 
 // tslint:disable-next-line: max-classes-per-file

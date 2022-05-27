@@ -12,6 +12,16 @@ export function fillerArray(end: number, filler: any = undefined): number[] {
     return result
 }
 
+
+export function fillerAutoIncrementArray(
+    // tslint:disable-next-line: no-unnecessary-initializer
+    end: number, filler: any = undefined
+): number[] {
+    const result = []
+    for (let i = 0; i < end; i++) result.push(filler++)
+    return result
+}
+
 export function fillerDateArray(fromDate: Date, end: number): Date[] {
     const result = []
     const start = fromDate
