@@ -26,10 +26,11 @@ import {
     dateString,
     fillerDateArray,
     getNameFromKey,
-    printMemory,
+    numberWithCommas,
     zeroPad
 } from './common.js'
 import { ArithmeticFunction } from './table/arithmeticTableFunction.js'
+import fs from 'fs-extra'
 
 class Runner {
     jurisdiction = 'united_states'
@@ -53,7 +54,6 @@ class Runner {
         console.log('Loading dataset...')
         const dataLoader = new DataLoader()
         this.data = await dataLoader.loadData('./data/world.csv')
-        console.log(this.data.get(this.jurisdiction).length)
         console.log('Dataset loaded.')
     }
 
@@ -130,9 +130,9 @@ class Runner {
                 fillerDateArray(row.date, this.extraDays)
             )
             this.table.insertRow([row.date, row.cases])
-            // this.updateChartData(chart, this.table.data)
+            this.updateChartData(chart, this.table.data)
             const lastT = zeroPad(rowIndex++, 3)
-            // await chart.save(`./out/test/${this.jurisdiction}/0_${lastT}.png`)
+            await chart.save(`${this.folder}/${lastT}.png`)
             this.table.reduceColumn(0, this.extraDays)
         }
     }
@@ -203,8 +203,10 @@ class Runner {
             )
             const chartData = sliceTable.data
             this.updateSliceChartData(chart, chartData)
+            const folder = `${this.folder}/${this.jurisdiction}/${sliceIndex}`
+            fs.ensureDirSync(folder)
             const lastT = zeroPad(i, 3)
-            await chart.save(`./out/test/${this.jurisdiction}/${sliceIndex + 1}_${lastT}.png`)
+            await chart.save(`${folder}/${lastT}.png`)
             sliceTable.reduceColumn(0, this.extraDays)
         }
     }
@@ -226,14 +228,18 @@ class Runner {
             new GompertzJtS3TableRowType('Prediction Total', 5, 2, 7), // 8
             new DiffTableRowType('Cases Prediction - Background', 8), // 9
             new ArithmeticTableRowType('Cases Prediction', 9,
-                ArithmeticFunction.ADD, 3, 0) // 10
+                ArithmeticFunction.ADD, 3, 0), // 10
+            new LocalExtremaTableRowType('Max', 10, LocalExtramaType.MAX) // 11
         ])
 
         const chart = new TwitterChart(
             `COVID-19 Cases - Latest Wave [${getNameFromKey(this.jurisdiction)}]`,
             'Source: OWID; Created by @USMortality',
             'Day',
-            'COVID-19 Cases'
+            'COVID-19 Cases',
+            0,
+            600,
+            600
         )
         chart.data = [
             {
@@ -264,13 +270,29 @@ class Runner {
                 color: [0, 200, 0, 0.67],
                 isDashed: false,
             },
+            {
+                axis: TwitterChartSeriesAxisType.x,
+                type: TwitterChartSeriesConfigType.label,
+                label: (rowIndex: number): string[] => {
+                    return [
+                        'Max',
+                        numberWithCommas(sliceTable.data[10][rowIndex]),
+                        dateString(sliceTable.data[0][rowIndex])
+                    ]
+                },
+                color: [255, 0, 0, .5],
+                isDashed: true
+            },
         ]
 
         const debugChart = new TwitterChart(
             `COVID-19 Cases - Latest Wave [${getNameFromKey(this.jurisdiction)}]`,
             'Source: OWID; Created by @USMortality',
             'Day',
-            'COVID-19 Cases'
+            'COVID-19 Cases',
+            0,
+            600,
+            600
         )
         debugChart.data = [
             {
@@ -322,12 +344,14 @@ class Runner {
             this.updateSliceChartData(chart, chartData)
             this.updateDebugChartData(debugChart, chartData)
             const lastT = zeroPad(i, 3)
-            const fileA = `./out/test/${this.jurisdiction}/__${sliceIndex + 1}_a_${lastT}.png`
+            const fileA = `${this.folder}/__a_${lastT}.png`
             await chart.save(fileA)
-            const fileB = `./out/test/${this.jurisdiction}/__${sliceIndex + 1}_b_${lastT}.png`
+            const fileB = `${this.folder}/__b_${lastT}.png`
             await debugChart.save(fileB)
-            const concatCmd = `convert \\( ${fileA} -append ${fileB} \\) +append ./out/test/${this.jurisdiction}/${sliceIndex + 1}_${lastT}.png`
+            const concatCmd = `convert \\( ${fileA} -append ${fileB} \\) ` +
+                `+append ./${this.folder}/${sliceIndex}_${lastT}.png`
             execSync(concatCmd)
+            execSync(`rm -rf ${this.folder}/__*.png`)
             sliceTable.reduceColumn(0, this.extraDays)
         }
     }
@@ -337,6 +361,7 @@ class Runner {
         chart.data[1].data = data[10]
         chart.data[2].data = data[3]
         chart.data[3].data = data[1]
+        chart.data[4].data = data[11]
     }
 
     private updateDebugChartData(chart: TwitterChart, data: any[][]): void {
@@ -347,36 +372,39 @@ class Runner {
         chart.data[4].data = data[8]
     }
 
-    makeMovie(): void {
-        const movie = `./out/${this.folder}/${this.jurisdiction}.mp4`
+    makeMovie(index: number, speed: number, resolution: string): void {
+        const movie = `${this.folder}/_${this.jurisdiction}.mp4`
         execSync(`rm -rf ${movie}`)
-        execSync(`rm -rf ./out/${this.folder}/${this.jurisdiction}/__*.png`)
-        // execSync(
-        //     `ffmpeg - hide_banner - loglevel error - r 1 - pattern_type glob - i './out/` +
-        //     `${this.folder}/${this.jurisdiction}/*.png' -c:v libx264 -vf "fps=30,format=yuv420p,scale` +
-        //     `=1200x670" ${movie}`
-        // )
         execSync(
-            `ffmpeg -hide_banner -loglevel error -r 3 -pattern_type glob -i './out/` +
-            `${this.folder}/${this.jurisdiction}/*.png' -c:v libx264 -vf "fps=30,format=yuv420p,scale` +
-            `=2400x670" ${movie}`
+            `ffmpeg -hide_banner -loglevel error -r ${speed} -pattern_type glob ` +
+            `-i '${this.folder}/*.png' -c:v libx264 -vf "fps=60,` +
+            `format=yuv420p,scale=${resolution}" ${movie}`
         )
     }
 
     async processData(): Promise<void> {
         console.log('Processing data...')
 
+        await this.setFolder(`./out/${this.jurisdiction}/0`)
         await this.makeOverviewChart()
+        await this.makeMovie(0, 30, '1200x670')
 
         // Latest outbreak
         const sliceData = this.table.splitAt(6, 1)
-        const sliceIndex = sliceData.length - 1
-        const lastSlice = sliceData[sliceIndex]
-        // await this.makeSliceChart2(sliceIndex, lastSlice)
+        const sliceIndex = sliceData.length
+        const lastSlice = sliceData[sliceIndex - 1]
+        await this.setFolder(`./out/${this.jurisdiction}/${sliceIndex}`)
+        await this.makeSliceChart2(sliceIndex, lastSlice)
 
-        await this.makeMovie()
+        await this.makeMovie(sliceIndex, 5, '1200x600')
 
-        // console.log('Processing data finished.')
+        console.log('Processing data finished.')
+    }
+
+    private async setFolder(folder): Promise<void> {
+        execSync(`rm -rf ${folder}`)
+        this.folder = folder
+        return fs.ensureDirSync(folder)
     }
 
     async run(): Promise<void> {

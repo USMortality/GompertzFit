@@ -22,7 +22,7 @@ import {
     SumTableRowType
 } from '../src/table/tableRowType.js'
 import { LocalExtramaType } from '../src/table/localExtremaTableFunction.js'
-import { fillerAutoIncrementArray } from '../src/common.js'
+import { fillerAutoIncrementArray, numberWithCommas } from '../src/common.js'
 import { ArithmeticFunction } from '../src/table/arithmeticTableFunction.js'
 
 describe('TwitterChart', () => {
@@ -188,6 +188,7 @@ describe('TwitterChart', () => {
             new DiffTableRowType('Cases Predicted', 9), // 10
             new ArithmeticTableRowType('Cases Predicted + Background',
                 10, ArithmeticFunction.ADD, 3, 0), // 11
+            new LocalExtremaTableRowType('Max', 11, LocalExtramaType.MAX) // 12
         ])
         const cases = [
             50636, 75025, 12711, 9534, 40344, 35746, 55385, 50664, 35436, 12332,
@@ -249,6 +250,19 @@ describe('TwitterChart', () => {
                 color: [0, 0, 200, 1],
                 isDashed: false,
                 data: table.data[1]
+            },
+            {
+                axis: TwitterChartSeriesAxisType.x,
+                type: TwitterChartSeriesConfigType.label,
+                label: (rowIndex: number): string[] => {
+                    return [
+                        'Max',
+                        numberWithCommas(table.data[11][rowIndex]),
+                        table.data[0][rowIndex]]
+                },
+                color: [255, 0, 0, .5],
+                isDashed: true,
+                data: table.data[12]
             },
         ]
 

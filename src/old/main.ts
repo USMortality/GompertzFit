@@ -20,6 +20,7 @@ import {
     TwitterChartSeriesConfigType
 } from '../twitterChart.js'
 import { DataLoader, Row } from '../dataLoader.js'
+import { promisify } from 'util'
 
 const ADDITIONAL_DAYS = 90
 const MAX_IMAGES = 1

@@ -1,8 +1,9 @@
-import { readFile, writeFile } from 'fs'
+import { mkdirSync, readFile, writeFile } from 'fs'
 import { createWriteStream } from 'fs'
 import { pipeline } from 'stream'
 import fetch from 'node-fetch'
-
+import { existsSync, mkdir } from 'fs'
+import { promisify } from 'util'
 import { Slice } from './old/slice.js'
 
 // tslint:disable-next-line: no-unnecessary-initializer
@@ -11,7 +12,6 @@ export function fillerArray(end: number, filler: any = undefined): number[] {
     for (let i = 0; i < end; i++) result.push(filler)
     return result
 }
-
 
 export function fillerAutoIncrementArray(
     // tslint:disable-next-line: no-unnecessary-initializer
@@ -113,4 +113,9 @@ export function printMemory(): void {
 
 export function zeroIfNanOrInfinite(value: number): number {
     return (isNaN(value) || !isFinite(value)) ? 0 : value
+}
+
+export function numberWithCommas(number, round: boolean = true): string {
+    const x = round ? Math.round(number) : number
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
 }

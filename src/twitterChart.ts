@@ -38,6 +38,8 @@ export class TwitterChart {
     yTitle: string
     data: TwitterChartSeries[]
     labelIndex: number
+    width: number
+    height: number
 
     private chartJSNodeCanvas: ChartJSNodeCanvas
 
@@ -46,17 +48,21 @@ export class TwitterChart {
         subtitle: string,
         xTitle: string,
         yTitle: string,
-        labelIndex: number = 0
+        labelIndex: number = 0,
+        width: number = 600,
+        height: number = 335,
     ) {
         this.title = title
         this.subtitle = subtitle
         this.xTitle = xTitle
         this.yTitle = yTitle
         this.labelIndex = labelIndex
+        this.width = width
+        this.height = height
 
         this.chartJSNodeCanvas = new ChartJSNodeCanvas({
-            width: 600,
-            height: 335,
+            width: this.width,
+            height: this.height,
             backgroundColour: 'white',
             plugins: {
                 modern: ['chartjs-plugin-annotation'],
