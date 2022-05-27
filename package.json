@@ -7,6 +7,7 @@
   "license": "ISC",
   "type": "module",
   "scripts": {
+    "lint": "./node_modules/.bin/tslint --project ./",
     "build": "rm -rf dist/* && npx tsc",
     "update": "node dist/src/download.js",
     "clean": "rm -rf ./out/*",

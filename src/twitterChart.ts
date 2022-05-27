@@ -200,7 +200,7 @@ export class TwitterChart {
                                             return `${item.getMonth() + 1}/` +
                                                 `${item.getFullYear().toString()}`
                                         }
-                                        return null;
+                                        return null
                                     default:
                                         return item
                                 }

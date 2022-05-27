@@ -105,8 +105,8 @@ class Runner {
             {
                 axis: TwitterChartSeriesAxisType.x,
                 type: TwitterChartSeriesConfigType.label,
-                label: (rowIndex: number): string[] => {
-                    return ['Minimum', dateString(this.table.data[0][rowIndex])]
+                label: (rowIdx: number): string[] => {
+                    return ['Minimum', dateString(this.table.data[0][rowIdx])]
                 },
                 color: [0, 0, 255, 1],
                 isDashed: true,
@@ -114,8 +114,8 @@ class Runner {
             {
                 axis: TwitterChartSeriesAxisType.x,
                 type: TwitterChartSeriesConfigType.label,
-                label: (rowIndex: number): string[] => {
-                    return ['Maximum', dateString(this.table.data[0][rowIndex])]
+                label: (rowIdx: number): string[] => {
+                    return ['Maximum', dateString(this.table.data[0][rowIdx])]
                 },
                 color: [255, 0, 0, 1],
                 isDashed: true,

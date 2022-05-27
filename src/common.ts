@@ -1,10 +1,7 @@
-import { mkdirSync, readFile, writeFile } from 'fs'
+import { readFile, writeFile } from 'fs'
 import { createWriteStream } from 'fs'
 import { pipeline } from 'stream'
 import fetch from 'node-fetch'
-import { existsSync, mkdir } from 'fs'
-import { promisify } from 'util'
-import { Slice } from './old/slice.js'
 
 // tslint:disable-next-line: no-unnecessary-initializer
 export function fillerArray(end: number, filler: any = undefined): number[] {
@@ -67,18 +64,6 @@ export async function loadJson(filename: string): Promise<object> {
     })
 }
 
-export async function loadSlices(
-    folder: string, jurisdiction: string
-): Promise<Slice[]> {
-    return new Promise((resolve, reject) => {
-        readFile(`./out/${folder}/${jurisdiction}/slices.json`,
-            { encoding: 'utf-8' }, (err, data) => {
-                if (err || !data) reject(err)
-                try { resolve(JSON.parse(data)) } catch (e) { reject(e) }
-            })
-    })
-}
-
 export function capitalizeFirstLetters(str: string): string {
     return str.toLowerCase().replace(/^\w|\s\w/g, (letter) => {
         return letter.toUpperCase()
@@ -115,7 +100,10 @@ export function zeroIfNanOrInfinite(value: number): number {
     return (isNaN(value) || !isFinite(value)) ? 0 : value
 }
 
-export function numberWithCommas(number, round: boolean = true): string {
-    const x = round ? Math.round(number) : number
+export function numberWithCommas(
+    num: number,
+    round: boolean = true
+): string {
+    const x = round ? Math.round(num) : num
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
 }
