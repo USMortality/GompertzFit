@@ -17,7 +17,9 @@ export class LoessTableFunction extends BasicTableFunction {
         const dataColumn = this.sourceColumn(data)
         if (dataColumn.length < 2) return fillerArray(dataColumn.length, 0)
 
-        return this.getLoess(data[this.xColumnIndex], dataColumn)
+        return this.getLoess(
+            data[this.xColumnIndex].slice(0, dataColumn.length), dataColumn
+        )
     }
 
     getLoess(
@@ -25,6 +27,6 @@ export class LoessTableFunction extends BasicTableFunction {
         values: number[],
         smoothFactor: number = 2 / 3
     ): number[] {
-        return lowess(t, values, { 'f': smoothFactor }).y
+        return lowess(t, values, { f: smoothFactor, sorted: true }).y
     }
 }

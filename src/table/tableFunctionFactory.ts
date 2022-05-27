@@ -14,7 +14,6 @@ import {
     GompertzJtS1TableRowType,
     GompertzJtS2TableRowType,
     GompertzJtS3TableRowType,
-    GompertzJtTableRowType,
     GompertzTableRowType,
     LocalExtremaTableRowType,
     LoessTableRowType,
@@ -29,7 +28,6 @@ import { GaussTableFunction } from './gaussTableFunction.js'
 import { LocalExtremaTableFunction } from './localExtremaTableFunction.js'
 import { GompertzTableFunction } from './gompertzTableFunction.js'
 import { ArithmeticTableFunction } from './arithmeticTableFunction.js'
-import { GompertzJtTableFunction } from './gompertzJtTableFunction.js'
 import { GompertzJtS1TableFunction } from './gompertzJtS1TableFunction.js'
 import { GompertzJtS2TableFunction } from './gompertzJtS2TableFunction.js'
 import { GompertzJtS3TableFunction } from './gompertzJtS3TableFunction.js'

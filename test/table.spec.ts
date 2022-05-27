@@ -4,7 +4,6 @@ import {
     GompertzJtS1TableRowType,
     GompertzJtS2TableRowType,
     GompertzJtS3TableRowType,
-    GompertzJtTableRowType,
     GompertzTableRowType
 } from './../src/table/tableRowType.js'
 import { LocalExtramaType } from './../src/table/localExtremaTableFunction.js'
