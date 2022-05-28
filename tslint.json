@@ -6,11 +6,15 @@
             true,
             "call-signature"
         ],
-        "max-line-length": {
-            "options": [
-                80
-            ]
-        },
+        "max-line-length": [
+            true,
+            {
+                "limit": 80,
+                "ignore-pattern": "^import |^export {(.*?)}",
+                "check-strings": true,
+                "check-regex": true
+            }
+        ],
         "new-parens": true,
         "no-arg": true,
         "no-bitwise": true,
@@ -24,6 +28,12 @@
         "quotemark": [
             true,
             "single"
+        ],
+        "no-unused-variable": [
+            true,
+            {
+                "ignore-pattern": "^_"
+            }
         ]
     },
     "jsRules": {

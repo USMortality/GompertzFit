@@ -1,4 +1,3 @@
-import { fillerArray } from '../common.js'
 import { BasicTableFunction } from './basicTableFunction.js'
 
 export class DiffTableFunction extends BasicTableFunction {

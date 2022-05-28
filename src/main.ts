@@ -158,7 +158,8 @@ class Runner {
         ])
 
         const chart = new TwitterChart(
-            `COVID-19 Cases - Latest Wave [${getNameFromKey(this.jurisdiction)}]`,
+            `COVID-19 Cases - Latest Wave ` +
+            `[${getNameFromKey(this.jurisdiction)}]`,
             'Source: OWID; Created by @USMortality',
             'Day',
             'COVID-19 Cases'
@@ -233,7 +234,8 @@ class Runner {
         ])
 
         const chart = new TwitterChart(
-            `COVID-19 Cases - Latest Wave [${getNameFromKey(this.jurisdiction)}]`,
+            `COVID-19 Cases - Latest Wave ` +
+            `[${getNameFromKey(this.jurisdiction)}]`,
             'Source: OWID; Created by @USMortality',
             'Day',
             'COVID-19 Cases',
@@ -286,7 +288,8 @@ class Runner {
         ]
 
         const debugChart = new TwitterChart(
-            `COVID-19 Cases - Latest Wave [${getNameFromKey(this.jurisdiction)}]`,
+            `COVID-19 Cases - Latest Wave ` +
+            `[${getNameFromKey(this.jurisdiction)}]`,
             'Source: OWID; Created by @USMortality',
             'Day',
             'COVID-19 Cases',
@@ -376,9 +379,9 @@ class Runner {
         const movie = `${this.folder}/_${this.jurisdiction}.mp4`
         execSync(`rm -rf ${movie}`)
         execSync(
-            `ffmpeg -hide_banner -loglevel error -r ${speed} -pattern_type glob ` +
-            `-i '${this.folder}/*.png' -c:v libx264 -vf "fps=60,` +
-            `format=yuv420p,scale=${resolution}" ${movie}`
+            `ffmpeg -hide_banner -loglevel error -r ${speed} ` +
+            `-pattern_type glob -i '${this.folder}/*.png' -c:v libx264 ` +
+            `-vf "fps=60,format=yuv420p,scale=${resolution}" ${movie}`
         )
     }
 

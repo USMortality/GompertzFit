@@ -110,7 +110,8 @@ export class TwitterChart {
         for (const data of this.data) {
             if (data.axis === TwitterChartSeriesAxisType.x) continue
             datasets.push({
-                yAxisID: (data.axis === TwitterChartSeriesAxisType.y) ? 'y' : 'y2',
+                yAxisID: (data.axis === TwitterChartSeriesAxisType.y) ?
+                    'y' : 'y2',
                 label: data.label,
                 data: data.data,
                 borderColor: `rgba(${data.color.join(',')})`,
@@ -198,7 +199,8 @@ export class TwitterChart {
                                     case Date:
                                         if (item.getDate() === 1) {
                                             return `${item.getMonth() + 1}/` +
-                                                `${item.getFullYear().toString()}`
+                                                `${item.getFullYear()
+                                                    .toString()}`
                                         }
                                         return null
                                     default:

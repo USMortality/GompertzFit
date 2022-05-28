@@ -312,7 +312,10 @@ describe('TwitterChart', () => {
         await chart.save('./test/out/test3.png')
         await looksSameAsync('./test/out/test3.png', './test/out/expected3.png')
         await debugChart.save('./test/out/test3d.png')
-        await looksSameAsync('./test/out/test3d.png', './test/out/expected3d.png')
+        await looksSameAsync(
+            './test/out/test3d.png',
+            './test/out/expected3d.png'
+        )
     })
 
     function looksSameAsync(file1: string, file2: string): Promise<void> {
