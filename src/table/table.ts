@@ -6,120 +6,120 @@ import os from 'os'
 import fs from 'fs'
 
 export class Table {
-    columnTitles: string[] = []
-    private tableRowTypes: TableRowType[] = []
-    private dataFunctionDefinitions: BasicFunctionalTableRowType[] = []
-    public data: any[][] = []
+  columnTitles: string[] = []
+  private tableRowTypes: TableRowType[] = []
+  private dataFunctionDefinitions: BasicFunctionalTableRowType[] = []
+  public data: any[][] = []
 
-    constructor(
-        tableRowTypes: TableRowType[]
-    ) {
-        for (const rowType of tableRowTypes) {
-            this.tableRowTypes.push(rowType)
-            this.columnTitles.push(rowType.title)
-            if (rowType instanceof BasicFunctionalTableRowType) {
-                this.dataFunctionDefinitions.push(rowType)
-            }
-            this.data.push([])
+  constructor(
+    tableRowTypes: TableRowType[]
+  ) {
+    for (const rowType of tableRowTypes) {
+      this.tableRowTypes.push(rowType)
+      this.columnTitles.push(rowType.title)
+      if (rowType instanceof BasicFunctionalTableRowType) {
+        this.dataFunctionDefinitions.push(rowType)
+      }
+      this.data.push([])
+    }
+  }
+
+  insertRow(row: any[], recalculate: boolean = true): void {
+    for (let i = 0; i < row.length; i++) this.data[i].push(row[i])
+    if (recalculate) this.recalculateDataFunctions()
+  }
+
+  insertRows(data: any[][]): void {
+    assert(data.length === this.staticColumnLength(), 'insertRows')
+
+    for (let rowIndex = 0; rowIndex < data[0].length; rowIndex++) {
+      const result = []
+      for (const colIndex in data) {
+        if (Object.prototype.hasOwnProperty.call(data, colIndex)) {
+          const value = data[colIndex][rowIndex]
+          if (value !== undefined) result.push(value)
         }
+      }
+      this.insertRow(result, false)
     }
+    this.recalculateDataFunctions()
+  }
 
-    insertRow(row: any[], recalculate: boolean = true): void {
-        for (let i = 0; i < row.length; i++) this.data[i].push(row[i])
-        if (recalculate) this.recalculateDataFunctions()
+  getRowAt(rowIndex: number): any[] {
+    const result = []
+    for (const column of this.data) {
+      result.push(column[rowIndex])
     }
+    return result
+  }
 
-    insertRows(data: any[][]): void {
-        assert(data.length === this.staticColumnLength(), 'insertRows')
+  splitAt(columnIndex: number, comparator: any): any[][] {
+    const result: any[][] = []
+    let lastRowIndex = 0
 
-        for (let rowIndex = 0; rowIndex < data[0].length; rowIndex++) {
-            const result = []
-            for (const colIndex in data) {
-                if (Object.prototype.hasOwnProperty.call(data, colIndex)) {
-                    const value = data[colIndex][rowIndex]
-                    if (value !== undefined) result.push(value)
-                }
-            }
-            this.insertRow(result, false)
-        }
-        this.recalculateDataFunctions()
-    }
-
-    getRowAt(rowIndex: number): any[] {
-        const result = []
+    for (let i = 0; i < this.data[columnIndex].length; i++) {
+      const subTableResult = []
+      if (this.data[columnIndex][i] === comparator
+        || this.data[columnIndex].length - 1 === i) {
         for (const column of this.data) {
-            result.push(column[rowIndex])
+          const subItem = column.slice(lastRowIndex, i)
+          subTableResult.push(subItem)
         }
-        return result
+        lastRowIndex = i
+      } else continue
+
+      result.push(subTableResult)
     }
 
-    splitAt(columnIndex: number, comparator: any): any[][] {
-        const result: any[][] = []
-        let lastRowIndex = 0
+    return result
+  }
 
-        for (let i = 0; i < this.data[columnIndex].length; i++) {
-            const subTableResult = []
-            if (this.data[columnIndex][i] === comparator
-                || this.data[columnIndex].length - 1 === i) {
-                for (const column of this.data) {
-                    const subItem = column.slice(lastRowIndex, i)
-                    subTableResult.push(subItem)
-                }
-                lastRowIndex = i
-            } else continue
+  print(): void {
+    console.log(JSON.stringify(this.data, null, 2))
+  }
 
-            result.push(subTableResult)
-        }
-
-        return result
+  saveCsv(filepath: string): void {
+    let result = this.makeCsvRow(this.columnTitles)
+    for (let row = 0; row < this.data[0].length; row++) {
+      const data = []
+      for (const column of this.data) {
+        data.push(column[row])
+      }
+      result += this.makeCsvRow(data)
     }
+    fs.writeFile(filepath, result, (err) => {
+      if (err) return console.log(err)
+    })
+  }
 
-    print(): void {
-        console.log(JSON.stringify(this.data, null, 2))
-    }
+  extendColumn(columnIndex: number, extender: any[]): void {
+    Array.prototype.push.apply(this.data[columnIndex], extender)
+  }
 
-    saveCsv(filepath: string): void {
-        let result = this.makeCsvRow(this.columnTitles)
-        for (let row = 0; row < this.data[0].length; row++) {
-            const data = []
-            for (const column of this.data) {
-                data.push(column[row])
-            }
-            result += this.makeCsvRow(data)
-        }
-        fs.writeFile(filepath, result, (err) => {
-            if (err) return console.log(err)
-        })
-    }
+  reduceColumn(columnIndex: number, length: number): void {
+    const currLength = this.data[columnIndex].length
+    this.data[columnIndex].splice(currLength - length, length)
+  }
 
-    extendColumn(columnIndex: number, extender: any[]): void {
-        Array.prototype.push.apply(this.data[columnIndex], extender)
+  private recalculateDataFunctions(): void {
+    let funIndex = 0
+    for (const dataFunctionDefinition of this.dataFunctionDefinitions) {
+      const targetColumnIndex = this.staticColumnLength() + funIndex
+      const fun: TableFunction = TableFunctionFactory.getFunction(
+        targetColumnIndex, dataFunctionDefinition
+      )
+      const data: number | number[] = fun.calculate(this.data)
+      if (Array.isArray(data)) this.data[targetColumnIndex] = data
+      else this.data[targetColumnIndex].push(data)
+      funIndex++
     }
+  }
 
-    reduceColumn(columnIndex: number, length: number): void {
-        const currLength = this.data[columnIndex].length
-        this.data[columnIndex].splice(currLength - length, length)
-    }
+  private staticColumnLength(): number {
+    return this.data.length - this.dataFunctionDefinitions.length
+  }
 
-    private recalculateDataFunctions(): void {
-        let funIndex = 0
-        for (const dataFunctionDefinition of this.dataFunctionDefinitions) {
-            const targetColumnIndex = this.staticColumnLength() + funIndex
-            const fun: TableFunction = TableFunctionFactory.getFunction(
-                targetColumnIndex, dataFunctionDefinition
-            )
-            const data: number | number[] = fun.calculate(this.data)
-            if (Array.isArray(data)) this.data[targetColumnIndex] = data
-            else this.data[targetColumnIndex].push(data)
-            funIndex++
-        }
-    }
-
-    private staticColumnLength(): number {
-        return this.data.length - this.dataFunctionDefinitions.length
-    }
-
-    private makeCsvRow(arr: any[]): string {
-        return '"' + Object.values(arr).join('","') + '"' + os.EOL
-    }
+  private makeCsvRow(arr: any[]): string {
+    return '"' + Object.values(arr).join('","') + '"' + os.EOL
+  }
 }
