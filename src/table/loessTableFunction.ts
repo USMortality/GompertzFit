@@ -13,7 +13,7 @@ export class LoessTableFunction extends BasicTableFunction {
     this.xColumnIndex = xColumnIndex
   }
 
-  override calculate(data: any[][]): number[] {
+  override calculate(data: number[][]): number[] {
     const dataColumn = this.sourceColumn(data)
     if (dataColumn.length < 2) return fillerArray(dataColumn.length, 0)
 

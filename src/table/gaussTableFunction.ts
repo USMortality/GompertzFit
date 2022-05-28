@@ -12,7 +12,7 @@ export class GaussTableFunction extends BasicTableFunction {
     this.iterations = iterations
   }
 
-  override calculate(data: any[][]): number[] {
+  override calculate(data: number[][]): number[] {
     const sourceColumn = this.sourceColumn(data)
     if (sourceColumn.length < 2) return sourceColumn
     return getSmoothedArrayMulti(sourceColumn, this.iterations, 5, 1, false)

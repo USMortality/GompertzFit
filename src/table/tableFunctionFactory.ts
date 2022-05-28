@@ -37,8 +37,8 @@ export class TableFunctionFactory {
     columnIndex: number,
     basicFunctionalTableRowType: BasicFunctionalTableRowType
   ): TableFunction {
-    const functionalTableRowType =
-      basicFunctionalTableRowType as FunctionalTableRowType
+    const functionalTableRowType
+      = basicFunctionalTableRowType as FunctionalTableRowType
 
     switch (basicFunctionalTableRowType.constructor) {
       case SumTableRowType:
@@ -47,16 +47,16 @@ export class TableFunctionFactory {
           functionalTableRowType.sourceColumnIndex
         )
       case SumNTableRowType:
-        const sumNTableRowType =
-          basicFunctionalTableRowType as SumNTableRowType
+        const sumNTableRowType
+          = basicFunctionalTableRowType as SumNTableRowType
         return new SumNTableFunction(
           columnIndex,
           sumNTableRowType.sourceColumnIndex,
           sumNTableRowType.n
         )
       case LoessTableRowType:
-        const loessTableRowType =
-          basicFunctionalTableRowType as LoessTableRowType
+        const loessTableRowType
+          = basicFunctionalTableRowType as LoessTableRowType
         return new LoessTableFunction(
           columnIndex,
           loessTableRowType.sourceColumnIndex,
@@ -82,8 +82,8 @@ export class TableFunctionFactory {
           functionalTableRowType.sourceColumnIndex
         )
       case AvgNTableRowType:
-        const avgNTableRowType =
-          basicFunctionalTableRowType as AvgNTableRowType
+        const avgNTableRowType
+          = basicFunctionalTableRowType as AvgNTableRowType
         return new AvgNTableFunction(
           columnIndex,
           avgNTableRowType.sourceColumnIndex,
@@ -95,24 +95,24 @@ export class TableFunctionFactory {
           functionalTableRowType.sourceColumnIndex
         )
       case LocalExtremaTableRowType:
-        const localExtremaTableRowType =
-          basicFunctionalTableRowType as LocalExtremaTableRowType
+        const localExtremaTableRowType
+          = basicFunctionalTableRowType as LocalExtremaTableRowType
         return new LocalExtremaTableFunction(
           columnIndex,
           localExtremaTableRowType.sourceColumnIndex,
           localExtremaTableRowType.type
         )
       case GompertzTableRowType:
-        const gompertzTableRowType =
-          basicFunctionalTableRowType as GompertzTableRowType
+        const gompertzTableRowType
+          = basicFunctionalTableRowType as GompertzTableRowType
         return new GompertzTableFunction(
           columnIndex,
           gompertzTableRowType.sourceColumnIndex,
           gompertzTableRowType.tColumnIndex
         )
       case ArithmeticTableRowType:
-        const addTableRowType =
-          basicFunctionalTableRowType as ArithmeticTableRowType
+        const addTableRowType
+          = basicFunctionalTableRowType as ArithmeticTableRowType
         return new ArithmeticTableFunction(
           columnIndex,
           addTableRowType.sourceColumnIndex,
@@ -126,8 +126,8 @@ export class TableFunctionFactory {
           functionalTableRowType.sourceColumnIndex
         )
       case GompertzJtS2TableRowType:
-        const gompertzJt2TableRowType =
-          basicFunctionalTableRowType as GompertzJtS2TableRowType
+        const gompertzJt2TableRowType
+          = basicFunctionalTableRowType as GompertzJtS2TableRowType
         return new GompertzJtS2TableFunction(
           columnIndex,
           gompertzJt2TableRowType.sourceColumnIndex,
@@ -135,8 +135,8 @@ export class TableFunctionFactory {
           gompertzJt2TableRowType.days
         )
       case GompertzJtS3TableRowType:
-        const gompertzJt3TableRowType =
-          basicFunctionalTableRowType as GompertzJtS3TableRowType
+        const gompertzJt3TableRowType
+          = basicFunctionalTableRowType as GompertzJtS3TableRowType
         return new GompertzJtS3TableFunction(
           columnIndex,
           functionalTableRowType.sourceColumnIndex,

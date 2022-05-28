@@ -16,7 +16,7 @@ export class LocalExtremaTableFunction extends BasicTableFunction {
     this.type = type
   }
 
-  override calculate(data: any[][]): number[] {
+  override calculate(data: number[][]): number[] {
     const sourceColumn = this.sourceColumn(data)
     const len = sourceColumn.length
     if (len < 3) return fillerArray(len, 0)
@@ -29,10 +29,10 @@ export class LocalExtremaTableFunction extends BasicTableFunction {
 
       switch (this.type) {
         case LocalExtramaType.MAX:
-          result.push((prev <= curr && curr >= next) ? 1 : 0)
+          result.push(prev <= curr && curr >= next ? 1 : 0)
           break
         case LocalExtramaType.MIN:
-          result.push((prev >= curr && curr <= next) ? 1 : 0)
+          result.push(prev >= curr && curr <= next ? 1 : 0)
           break
       }
     }

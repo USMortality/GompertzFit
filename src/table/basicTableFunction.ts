@@ -1,5 +1,5 @@
 export interface TableFunction {
-  calculate(data: any[][]): number | number[]
+  calculate(data: number[][]): number | number[]
 }
 
 export abstract class BasicTableFunction implements TableFunction {
@@ -14,27 +14,27 @@ export abstract class BasicTableFunction implements TableFunction {
     this.sourceColumnIndex = sourceColumnIndex
   }
 
-  abstract calculate(data: any[][]): number[]
+  abstract calculate(data: number[][]): number[]
 
-  lastTargetElement(data: any[][]): number {
+  lastTargetElement(data: number[][]): number {
     const targetRow = this.targetColumn(data)
     return targetRow.length > 0 ? targetRow[targetRow.length - 1] : 0
   }
 
-  lastSourceElement(data: any[][]): number {
+  lastSourceElement(data: number[][]): number {
     const sourceRow = this.sourceColumn(data)
     return sourceRow[sourceRow.length - 1]
   }
 
-  targetColumn(data: any[][]): any[] {
+  targetColumn(data: number[][]): number[] {
     return data[this.columnIndex]
   }
 
-  sourceColumn(data: any[][]): any[] {
+  sourceColumn(data: number[][]): number[] {
     return data[this.sourceColumnIndex]
   }
 
-  getStart(data: any[][], n: number): number {
+  getStart(data: number[][], n: number): number {
     const columnData = this.sourceColumn(data)
     return columnData.length < n ? 0 : columnData.length - n
   }

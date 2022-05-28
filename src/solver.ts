@@ -1,4 +1,4 @@
-export type GompertzParams = {
+export interface GompertzParams {
   a: number,
   b: number,
   c: number,
@@ -33,11 +33,11 @@ export function solve(
 
 function _getResidual(
   values: number[],
-  fun: (t: number, ...args: number[]) => number,
+  fun: (t: number, ...funArgs: number[]) => number,
   ...args: number[]
 ): number {
-  let result: number = 0
-  let t: number = 0
+  let result = 0
+  let t = 0
 
   for (const value of values) {
     const res = value - fun(t, ...args)

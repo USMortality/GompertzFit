@@ -1,18 +1,19 @@
-import { readFile, writeFile } from 'fs'
-import { createWriteStream } from 'fs'
+import { readFile, writeFile, createWriteStream } from 'fs'
 import { pipeline } from 'stream'
 import fetch from 'node-fetch'
 
-// eslint-disable-next-line no-undef-init
-export function fillerArray(end: number, filler: any = undefined): number[] {
+export function fillerArray(
+  end: number,
+  filler: number | string = undefined
+): number[] {
   const result = []
   for (let i = 0; i < end; i++) result.push(filler)
   return result
 }
 
 export function fillerAutoIncrementArray(
-  // eslint-disable-next-line no-undef-init
-  end: number, filler: any = undefined
+  end: number,
+  filler = 0
 ): number[] {
   const result = []
   for (let i = 0; i < end; i++) result.push(filler++)
@@ -43,8 +44,8 @@ export function addDays(date: Date, days: number): Date {
 
 export async function saveImage(image: Buffer, filename: string):
   Promise<void> {
-  return new Promise((resolve) => {
-    writeFile(filename, image, 'base64', (err) => {
+  return new Promise(resolve => {
+    writeFile(filename, image, 'base64', err => {
       if (err) console.error(err)
       resolve()
     })
@@ -59,15 +60,17 @@ export async function loadJson(filename: string): Promise<object> {
   return new Promise((resolve, reject) => {
     readFile(filename, { encoding: 'utf-8' }, (err, data) => {
       if (err || !data) reject(err)
-      try { resolve(JSON.parse(data)) } catch (e) { reject(e) }
+      try {
+        resolve(JSON.parse(data))
+      } catch (e) {
+        reject(e)
+      }
     })
   })
 }
 
 export function capitalizeFirstLetters(str: string): string {
-  return str.toLowerCase().replace(/^\w|\s\w/g, (letter) => {
-    return letter.toUpperCase()
-  })
+  return str.toLowerCase().replace(/^\w|\s\w/g, letter => letter.toUpperCase())
 }
 
 export async function download(urlString: string, file: string): Promise<void> {
@@ -75,8 +78,8 @@ export async function download(urlString: string, file: string): Promise<void> {
   if (!response.ok) {
     throw new Error(`unexpected response ${response.statusText}`)
   }
-  return new Promise((resolve) => {
-    pipeline(response.body, createWriteStream(file), (err) => {
+  return new Promise(resolve => {
+    pipeline(response.body, createWriteStream(file), err => {
       if (err) console.error(err)
       resolve()
     })
@@ -99,12 +102,12 @@ export function printMemory(): void {
 }
 
 export function zeroIfNanOrInfinite(value: number): number {
-  return (isNaN(value) || !isFinite(value)) ? 0 : value
+  return isNaN(value) || !isFinite(value) ? 0 : value
 }
 
 export function numberWithCommas(
   num: number,
-  round: boolean = true
+  round = true
 ): string {
   const x = round ? Math.round(num) : num
   return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')

@@ -1,7 +1,7 @@
 import { BasicTableFunction } from './basicTableFunction.js'
 
 export class SumTableFunction extends BasicTableFunction {
-  override calculate(data: any[][]): number[] {
+  override calculate(data: number[][]): number[] {
     const result = []
     const columnData = this.sourceColumn(data)
     for (let i = 0; i < columnData.length; i++) {

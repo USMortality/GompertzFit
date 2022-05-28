@@ -30,7 +30,7 @@ import {
   zeroPad
 } from './common.js'
 import { ArithmeticFunction } from './table/arithmeticTableFunction.js'
-import fs from 'fs-extra'
+import { ensureDir } from 'fs-extra'
 
 class Runner {
   jurisdiction = 'united_states'
@@ -105,18 +105,14 @@ class Runner {
       {
         axis: TwitterChartSeriesAxisType.x,
         type: TwitterChartSeriesConfigType.label,
-        label: (rowIdx: number): string[] => {
-          return ['Minimum', dateString(this.table.data[0][rowIdx])]
-        },
+        label: (rowIdx: number): string[] => ['Minimum', dateString(this.table.data[0][rowIdx])],
         color: [0, 0, 255, 1],
         isDashed: true,
       },
       {
         axis: TwitterChartSeriesAxisType.x,
         type: TwitterChartSeriesConfigType.label,
-        label: (rowIdx: number): string[] => {
-          return ['Maximum', dateString(this.table.data[0][rowIdx])]
-        },
+        label: (rowIdx: number): string[] => ['Maximum', dateString(this.table.data[0][rowIdx])],
         color: [255, 0, 0, 1],
         isDashed: true,
       },
@@ -158,8 +154,8 @@ class Runner {
     ])
 
     const chart = new TwitterChart(
-      `COVID-19 Cases - Latest Wave ` +
-      `[${getNameFromKey(this.jurisdiction)}]`,
+      'COVID-19 Cases - Latest Wave '
+      + `[${getNameFromKey(this.jurisdiction)}]`,
       'Source: OWID; Created by @USMortality',
       'Day',
       'COVID-19 Cases'
@@ -205,7 +201,7 @@ class Runner {
       const chartData = sliceTable.data
       this.updateSliceChartData(chart, chartData)
       const folder = `${this.folder}/${this.jurisdiction}/${sliceIndex}`
-      fs.ensureDirSync(folder)
+      await ensureDir(folder)
       const lastT = zeroPad(i, 3)
       await chart.save(`${folder}/${lastT}.png`)
       sliceTable.reduceColumn(0, this.extraDays)
@@ -234,8 +230,8 @@ class Runner {
     ])
 
     const chart = new TwitterChart(
-      `COVID-19 Cases - Latest Wave ` +
-      `[${getNameFromKey(this.jurisdiction)}]`,
+      'COVID-19 Cases - Latest Wave '
+      + `[${getNameFromKey(this.jurisdiction)}]`,
       'Source: OWID; Created by @USMortality',
       'Day',
       'COVID-19 Cases',
@@ -275,21 +271,19 @@ class Runner {
       {
         axis: TwitterChartSeriesAxisType.x,
         type: TwitterChartSeriesConfigType.label,
-        label: (rowIndex: number): string[] => {
-          return [
-            'Max',
-            numberWithCommas(sliceTable.data[10][rowIndex]),
-            dateString(sliceTable.data[0][rowIndex])
-          ]
-        },
+        label: (rowIndex: number): string[] => [
+          'Max',
+          numberWithCommas(sliceTable.data[10][rowIndex]),
+          dateString(sliceTable.data[0][rowIndex])
+        ],
         color: [255, 0, 0, .5],
         isDashed: true
       },
     ]
 
     const debugChart = new TwitterChart(
-      `COVID-19 Cases - Latest Wave ` +
-      `[${getNameFromKey(this.jurisdiction)}]`,
+      'COVID-19 Cases - Latest Wave '
+      + `[${getNameFromKey(this.jurisdiction)}]`,
       'Source: OWID; Created by @USMortality',
       'Day',
       'COVID-19 Cases',
@@ -351,8 +345,8 @@ class Runner {
       await chart.save(fileA)
       const fileB = `${this.folder}/__b_${lastT}.png`
       await debugChart.save(fileB)
-      const concatCmd = `convert \\( ${fileA} -append ${fileB} \\) ` +
-        `+append ./${this.folder}/${sliceIndex}_${lastT}.png`
+      const concatCmd = `convert \\( ${fileA} -append ${fileB} \\) `
+        + `+append ./${this.folder}/${sliceIndex}_${lastT}.png`
       execSync(concatCmd)
       execSync(`rm -rf ${this.folder}/__*.png`)
       sliceTable.reduceColumn(0, this.extraDays)
@@ -379,9 +373,9 @@ class Runner {
     const movie = `${this.folder}/_${this.jurisdiction}.mp4`
     execSync(`rm -rf ${movie}`)
     execSync(
-      `ffmpeg -hide_banner -loglevel error -r ${speed} ` +
-      `-pattern_type glob -i '${this.folder}/*.png' -c:v libx264 ` +
-      `-vf "fps=60,format=yuv420p,scale=${resolution}" ${movie}`
+      `ffmpeg -hide_banner -loglevel error -r ${speed} `
+      + `-pattern_type glob -i '${this.folder}/*.png' -c:v libx264 `
+      + `-vf "fps=60,format=yuv420p,scale=${resolution}" ${movie}`
     )
   }
 
@@ -407,7 +401,7 @@ class Runner {
   private async setFolder(folder): Promise<void> {
     execSync(`rm -rf ${folder}`)
     this.folder = folder
-    return fs.ensureDirSync(folder)
+    return await ensureDir(folder)
   }
 
   async run(): Promise<void> {

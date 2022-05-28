@@ -2,8 +2,7 @@ import { zeroIfNanOrInfinite } from '../common.js'
 import { BasicTableFunction } from './basicTableFunction.js'
 
 export class GompertzJtS1TableFunction extends BasicTableFunction {
-
-  override calculate(data: any[][]): number[] {
+  override calculate(data: number[][]): number[] {
     const columnData = this.sourceColumn(data)
 
     const growthFactors = []

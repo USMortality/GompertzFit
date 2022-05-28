@@ -24,7 +24,7 @@ export class Table {
     }
   }
 
-  insertRow(row: any[], recalculate: boolean = true): void {
+  insertRow(row: any[], recalculate = true): void {
     for (let i = 0; i < row.length; i++) this.data[i].push(row[i])
     if (recalculate) this.recalculateDataFunctions()
   }
@@ -35,7 +35,7 @@ export class Table {
     for (let rowIndex = 0; rowIndex < data[0].length; rowIndex++) {
       const result = []
       for (const colIndex in data) {
-        if (Object.prototype.hasOwnProperty.call(data, colIndex)) {
+        if (Reflect.apply(Object, data, [colIndex])) {
           const value = data[colIndex][rowIndex]
           if (value !== undefined) result.push(value)
         }
@@ -87,13 +87,13 @@ export class Table {
       }
       result += this.makeCsvRow(data)
     }
-    fs.writeFile(filepath, result, (err) => {
+    fs.writeFile(filepath, result, err => {
       if (err) return console.log(err)
     })
   }
 
   extendColumn(columnIndex: number, extender: any[]): void {
-    Array.prototype.push.apply(this.data[columnIndex], extender)
+    Reflect.apply(Array, this.data[columnIndex], extender)
   }
 
   reduceColumn(columnIndex: number, length: number): void {
@@ -120,6 +120,6 @@ export class Table {
   }
 
   private makeCsvRow(arr: any[]): string {
-    return '"' + Object.values(arr).join('","') + '"' + os.EOL
+    return `"${Object.values(arr).join('","')}"${os.EOL}`
   }
 }

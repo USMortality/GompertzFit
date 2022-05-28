@@ -16,7 +16,7 @@ export class GompertzJtS3TableFunction extends BasicTableFunction {
     this.s2ColumnIndex = s2ColumnIndex
   }
 
-  override calculate(data: any[][]): number[] {
+  override calculate(data: number[][]): number[] {
     const columnData = this.sourceColumn(data)
     const xData = data[this.xColumnIndex]
     const growthFactorsPredicted = data[this.s2ColumnIndex]

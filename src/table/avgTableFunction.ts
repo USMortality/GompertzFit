@@ -1,7 +1,7 @@
 import { BasicTableFunction } from './basicTableFunction.js'
 
 export class AvgTableFunction extends BasicTableFunction {
-  override calculate(data: any[][]): number[] {
+  override calculate(data: number[][]): number[] {
     const result = []
     const columnData = this.sourceColumn(data)
 

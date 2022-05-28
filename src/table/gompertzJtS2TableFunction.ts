@@ -16,7 +16,7 @@ export class GompertzJtS2TableFunction extends BasicTableFunction {
     this.days = days
   }
 
-  override calculate(data: any[][]): number[] {
+  override calculate(data: number[][]): number[] {
     const columnData = this.sourceColumn(data)
     const xData = this.makeXRow(columnData.length)
     const result = []

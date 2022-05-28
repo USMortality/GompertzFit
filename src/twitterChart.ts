@@ -5,7 +5,7 @@ import { writeFile } from 'fs'
 
 export enum TwitterChartSeriesAxisType { x, y, y2 }
 export enum TwitterChartSeriesConfigType { dot, line, label }
-export type TwitterChartSeries = {
+export interface TwitterChartSeries {
   axis: TwitterChartSeriesAxisType,
   type: TwitterChartSeriesConfigType,
   label: string | ((rowIndex: number) => string[]),
@@ -48,9 +48,9 @@ export class TwitterChart {
     subtitle: string,
     xTitle: string,
     yTitle: string,
-    labelIndex: number = 0,
-    width: number = 600,
-    height: number = 335,
+    labelIndex = 0,
+    width = 600,
+    height = 335,
   ) {
     this.title = title
     this.subtitle = subtitle
@@ -78,8 +78,8 @@ export class TwitterChart {
   makeLabels(): any[] {
     const labels: any[] = []
     for (const data of this.data) {
-      if (data.axis === TwitterChartSeriesAxisType.x &&
-        data.type === TwitterChartSeriesConfigType.label) {
+      if (data.axis === TwitterChartSeriesAxisType.x
+        && data.type === TwitterChartSeriesConfigType.label) {
         for (let i = 0; i < data.data.length; i++) {
           const row = data.data[i]
           if (row > 0) {
@@ -110,18 +110,18 @@ export class TwitterChart {
     for (const data of this.data) {
       if (data.axis === TwitterChartSeriesAxisType.x) continue
       datasets.push({
-        yAxisID: (data.axis === TwitterChartSeriesAxisType.y) ?
-          'y' : 'y2',
+        yAxisID: data.axis === TwitterChartSeriesAxisType.y
+          ? 'y' : 'y2',
         label: data.label,
         data: data.data,
         borderColor: `rgba(${data.color.join(',')})`,
         backgroundColor: `rgba(${data.color.join(',')})`,
         fill: false,
         borderDash: data.isDashed ? [4, 4] : [0, 0],
-        borderWidth: data.type === TwitterChartSeriesConfigType.dot ?
-          0 : 2,
-        pointRadius: data.type === TwitterChartSeriesConfigType.dot ?
-          2.5 : 0,
+        borderWidth: data.type === TwitterChartSeriesConfigType.dot
+          ? 0 : 2,
+        pointRadius: data.type === TwitterChartSeriesConfigType.dot
+          ? 2.5 : 0,
         tension: 0.4,
       })
     }
@@ -192,15 +192,13 @@ export class TwitterChart {
                 size: 10
               },
               color: 'rgba(0, 0, 0, 100%)',
-              callback: (value, index, values) => {
-                const item: any = this.data[this.labelIndex]
-                  .data[index]
+              callback: (_value, index) => {
+                const item = this.data[this.labelIndex].data[index]
                 switch (item.constructor) {
                   case Date:
-                    if (item.getDate() === 1) {
-                      return `${item.getMonth() + 1}/` +
-                        `${item.getFullYear()
-                          .toString()}`
+                    const d = item as Date
+                    if (d.getDate() === 1) {
+                      return `${d.getMonth() + 1}/${d.getFullYear().toString()}`
                     }
                     return null
                   default:

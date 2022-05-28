@@ -20,7 +20,7 @@ export class ArithmeticTableFunction extends BasicTableFunction {
     this.termRowIndex = termRowIndex
   }
 
-  override calculate(data: any[][]): number[] {
+  override calculate(data: number[][]): number[] {
     const term = data[this.termColumnIndex][this.termRowIndex]
     const result = []
 
@@ -44,5 +44,4 @@ export class ArithmeticTableFunction extends BasicTableFunction {
 
     return result
   }
-
 }

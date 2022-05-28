@@ -1,4 +1,4 @@
-import { ArithmeticFunction } from './arithmeticTableFunction.js'
+import { ArithmeticFunction } from './arithmeticTableFunction'
 import { LocalExtramaType } from './localExtremaTableFunction.js'
 export abstract class TableRowType {
   title: string
@@ -29,7 +29,7 @@ export abstract class FunctionalTableRowType
 // eslint-disable-next-line max-classes-per-file
 export class AutoIncrementTableRowType extends BasicFunctionalTableRowType {
   extraRows: number
-  constructor(title: string, extraRows: number = 0) {
+  constructor(title: string, extraRows = 0) {
     super(title)
     this.extraRows = extraRows
   }

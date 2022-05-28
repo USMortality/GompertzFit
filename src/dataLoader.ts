@@ -1,7 +1,7 @@
 import * as csvtojson from 'csvtojson'
 import { getKey } from './common.js'
 
-export type Row = {
+export interface Row {
   date: Date,
   cases: number
 }
@@ -41,8 +41,8 @@ export class DataLoader {
 
       const row: Row = {
         date: new Date(data.date),
-        cases: parseInt((data.cases) ?
-          data.cases : data.total_cases, 10)
+        cases: parseInt(data.cases
+          ? data.cases : data.total_cases, 10)
       }
 
       const key = getKey(jurisdiction)
@@ -64,5 +64,4 @@ export class DataLoader {
     }
     return result
   }
-
 }
