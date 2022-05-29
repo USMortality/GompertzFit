@@ -15,11 +15,11 @@ describe('common.ts', () => {
       expect(result[0]).to.equal(undefined)
       expect(result[1]).to.equal(undefined)
     })
-    it('fillerArray return array of 2x string', () => {
-      const result = fillerArray(2, 'string')
+    it('fillerArray return array of 2x number', () => {
+      const result = fillerArray(2, 10)
       expect(result.length).to.equal(2)
-      expect(result[0]).to.equal('string')
-      expect(result[1]).to.equal('string')
+      expect(result[0]).to.equal(10)
+      expect(result[1]).to.equal(10)
     })
   })
   describe('fillerDateArray', () => {
@@ -61,9 +61,9 @@ describe('common.ts', () => {
     const dataLoader = new DataLoader()
     it('usa.csv format parsing', async () => {
       const data = await dataLoader.processCsvRows([
-        { 'date': '2020-03-17', 'state': 'Florida', 'cases': '10' },
-        { 'date': '2020-03-18', 'state': 'Florida', 'cases': '15' },
-        { 'date': '2020-03-17', 'state': 'Texas', 'cases': '25' }
+        { date: '2020-03-17', state: 'Florida', cases: '10' },
+        { date: '2020-03-18', state: 'Florida', cases: '15' },
+        { date: '2020-03-17', state: 'Texas', cases: '25' }
       ])
       const flData: Row[] = data.get('florida')
       expect(flData.length).to.equal(2)
@@ -74,19 +74,19 @@ describe('common.ts', () => {
     it('world.csv format parsing', async () => {
       const data = await dataLoader.processCsvRows([
         {
-          'date': '2020-03-17',
-          'location': 'Germany',
-          'total_cases': '10'
+          date: '2020-03-17',
+          location: 'Germany',
+          total_cases: '10'
         },
         {
-          'date': '2020-03-18',
-          'location': 'Germany',
-          'total_cases': '15'
+          date: '2020-03-18',
+          location: 'Germany',
+          total_cases: '15'
         },
         {
-          'date': '2020-03-17',
-          'location': 'France',
-          'total_cases': '25'
+          date: '2020-03-17',
+          location: 'France',
+          total_cases: '25'
         }
       ])
       const flData: Row[] = data.get('germany')

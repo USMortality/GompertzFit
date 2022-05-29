@@ -92,8 +92,10 @@ export class Table {
     })
   }
 
-  extendColumn(columnIndex: number, extender: any[]): void {
-    Reflect.apply(Array, this.data[columnIndex], extender)
+  extendColumn(columnIndex: number, extender: number[] | Date[]): void {
+    // console.log(this.data[columnIndex])
+    // Array.prototype.push.apply(this.data[columnIndex], extender)
+    Reflect.apply(Array.prototype.push, this.data[columnIndex], extender)
   }
 
   reduceColumn(columnIndex: number, length: number): void {

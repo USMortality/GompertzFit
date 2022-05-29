@@ -2,10 +2,7 @@ import { readFile, writeFile, createWriteStream } from 'fs'
 import { pipeline } from 'stream'
 import fetch from 'node-fetch'
 
-export function fillerArray(
-  end: number,
-  filler: number | string = undefined
-): number[] {
+export function fillerArray(end: number, filler: number = undefined): number[] {
   const result = []
   for (let i = 0; i < end; i++) result.push(filler)
   return result
