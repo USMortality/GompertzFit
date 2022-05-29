@@ -1,5 +1,5 @@
 export interface TableFunction {
-  calculate(data: number[][]): number | number[]
+  calculate(data: (Date[] | number[])[]): number | number[]
 }
 
 export abstract class BasicTableFunction implements TableFunction {

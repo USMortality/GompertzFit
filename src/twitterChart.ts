@@ -11,7 +11,7 @@ export interface TwitterChartSeries {
   label: string | ((rowIndex: number) => string[]),
   color: number[],
   isDashed: boolean,
-  data?: any[]
+  data?: number[] | Date[]
 }
 const line = {
   type: 'line',
@@ -75,8 +75,8 @@ export class TwitterChart {
     await this.saveImage(buffer, filename)
   }
 
-  makeLabels(): any[] {
-    const labels: any[] = []
+  makeLabels(): object[] {
+    const labels: object[] = []
     for (const data of this.data) {
       if (data.axis === TwitterChartSeriesAxisType.x
         && data.type === TwitterChartSeriesConfigType.label) {
@@ -105,23 +105,20 @@ export class TwitterChart {
     else return [label]
   }
 
-  makeDataSet(): any[] {
-    const datasets: any[] = []
+  makeDataSet(): object[] {
+    const datasets: object[] = []
     for (const data of this.data) {
       if (data.axis === TwitterChartSeriesAxisType.x) continue
       datasets.push({
-        yAxisID: data.axis === TwitterChartSeriesAxisType.y
-          ? 'y' : 'y2',
+        yAxisID: data.axis === TwitterChartSeriesAxisType.y ? 'y' : 'y2',
         label: data.label,
         data: data.data,
         borderColor: `rgba(${data.color.join(',')})`,
         backgroundColor: `rgba(${data.color.join(',')})`,
         fill: false,
         borderDash: data.isDashed ? [4, 4] : [0, 0],
-        borderWidth: data.type === TwitterChartSeriesConfigType.dot
-          ? 0 : 2,
-        pointRadius: data.type === TwitterChartSeriesConfigType.dot
-          ? 2.5 : 0,
+        borderWidth: data.type === TwitterChartSeriesConfigType.dot ? 0 : 2,
+        pointRadius: data.type === TwitterChartSeriesConfigType.dot ? 2.5 : 0,
         tension: 0.4,
       })
     }
@@ -132,7 +129,8 @@ export class TwitterChart {
     const configuration: ChartConfiguration = {
       type: 'line',
       data: {
-        datasets: this.makeDataSet(),
+        /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+        datasets: this.makeDataSet() as any,
         labels: this.data[this.labelIndex].data
       },
       options: {
@@ -171,6 +169,7 @@ export class TwitterChart {
             usePointStyle: true,
             pointStyle: 'cross'
           }
+          /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
         } as any,
         scales: {
           x: {
@@ -194,16 +193,13 @@ export class TwitterChart {
               color: 'rgba(0, 0, 0, 100%)',
               callback: (_value, index) => {
                 const item = this.data[this.labelIndex].data[index]
-                switch (item.constructor) {
-                  case Date:
-                    const d = item as Date
-                    if (d.getDate() === 1) {
-                      return `${d.getMonth() + 1}/${d.getFullYear().toString()}`
-                    }
-                    return null
-                  default:
-                    return item
-                }
+                if (item instanceof Date) {
+                  const d = item as Date
+                  if (d.getDate() === 1) {
+                    return `${d.getMonth() + 1}/${d.getFullYear().toString()}`
+                  }
+                  return null
+                } else return item
               }
             }
           },

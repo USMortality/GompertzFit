@@ -57,7 +57,10 @@ class Runner {
     console.log('Dataset loaded.')
   }
 
-  private updateChartData(chart: TwitterChart, data: any[][]): void {
+  private updateChartData(
+    chart: TwitterChart,
+    data: (Date[] | number[])[]
+  ): void {
     chart.data[0].data = data[0]
     chart.data[1].data = data[5]
     chart.data[2].data = data[4]
@@ -105,14 +108,20 @@ class Runner {
       {
         axis: TwitterChartSeriesAxisType.x,
         type: TwitterChartSeriesConfigType.label,
-        label: (rowIdx: number): string[] => ['Minimum', dateString(this.table.data[0][rowIdx])],
+        label: (rowIdx: number): string[] => [
+          'Minimum',
+          dateString(this.table.data[0][rowIdx] as Date)
+        ],
         color: [0, 0, 255, 1],
         isDashed: true,
       },
       {
         axis: TwitterChartSeriesAxisType.x,
         type: TwitterChartSeriesConfigType.label,
-        label: (rowIdx: number): string[] => ['Maximum', dateString(this.table.data[0][rowIdx])],
+        label: (rowIdx: number): string[] => [
+          'Maximum',
+          dateString(this.table.data[0][rowIdx] as Date)
+        ],
         color: [255, 0, 0, 1],
         isDashed: true,
       },
@@ -125,7 +134,7 @@ class Runner {
       this.table.extendColumn(0,
         fillerDateArray(row.date, this.extraDays)
       )
-      this.table.insertRow([row.date, row.cases])
+      this.table.insertRow([row.date, row.cases] as Date[] | number[])
       this.updateChartData(chart, this.table.data)
       const lastT = zeroPad(rowIndex++, 3)
       await chart.save(`${this.folder}/${lastT}.png`)
@@ -133,12 +142,15 @@ class Runner {
     }
   }
 
-  private getDateLabels(dateRow: any[], extraDays: number): Date[] {
+  private getDateLabels(dateRow: Date[], extraDays: number): Date[] {
     const lastDate = dateRow[dateRow.length - 1]
     return dateRow.concat(fillerDateArray(lastDate, extraDays))
   }
 
-  async makeSliceChart(sliceIndex: number, slice: any[][]): Promise<void> {
+  async makeSliceChart(
+    sliceIndex: number,
+    slice: (Date[] | number[])[]
+  ): Promise<void> {
     console.log('Making slice chart')
 
     const sliceTable: Table = new Table([
@@ -191,12 +203,15 @@ class Runner {
       },
     ]
 
-    const data = [this.getDateLabels(slice[0], this.extraDays), slice[4]]
+    const data = [
+      this.getDateLabels(slice[0] as Date[], this.extraDays),
+      slice[4]
+    ]
     for (let i = 0; i < data[1].length; i++) {
       console.log(`Processing ${data[0][i]}`)
-      sliceTable.insertRow([data[0][i], data[1][i]])
+      sliceTable.insertRow([data[0][i], data[1][i]] as (Date[] | number[]))
       sliceTable.extendColumn(0,
-        fillerDateArray(data[0][i], this.extraDays)
+        fillerDateArray(data[0][i] as Date, this.extraDays)
       )
       const chartData = sliceTable.data
       this.updateSliceChartData(chart, chartData)
@@ -208,7 +223,7 @@ class Runner {
     }
   }
 
-  async makeSliceChart2(sliceIndex: number, slice: any[][]): Promise<void> {
+  async makeSliceChart2(sliceIndex: number, slice: (Date[] | number[])[]): Promise<void> {
     console.log('Making slice chart')
 
     const sliceTable: Table = new Table([
@@ -273,8 +288,8 @@ class Runner {
         type: TwitterChartSeriesConfigType.label,
         label: (rowIndex: number): string[] => [
           'Max',
-          numberWithCommas(sliceTable.data[10][rowIndex]),
-          dateString(sliceTable.data[0][rowIndex])
+          numberWithCommas(sliceTable.data[10][rowIndex] as number),
+          dateString(sliceTable.data[0][rowIndex] as Date)
         ],
         color: [255, 0, 0, .5],
         isDashed: true
@@ -329,12 +344,15 @@ class Runner {
       },
     ]
 
-    const data = [this.getDateLabels(slice[0], this.extraDays), slice[4]]
+    const data = [
+      this.getDateLabels(slice[0] as Date[], this.extraDays),
+      slice[4]
+    ]
     for (let i = 0; i < data[1].length; i++) {
       console.log(`Processing ${data[0][i]}`)
-      sliceTable.insertRow([data[0][i], data[1][i]])
+      sliceTable.insertRow([data[0][i], data[1][i]] as (number[] | Date[]))
 
-      const extraDates = fillerDateArray(data[0][i], this.extraDays)
+      const extraDates = fillerDateArray(data[0][i] as Date, this.extraDays)
       sliceTable.extendColumn(0, extraDates)
 
       const chartData = sliceTable.data
@@ -353,7 +371,10 @@ class Runner {
     }
   }
 
-  private updateSliceChartData(chart: TwitterChart, data: any[][]): void {
+  private updateSliceChartData(
+    chart: TwitterChart,
+    data: (Date[] | number[])[]
+  ): void {
     chart.data[0].data = data[0]
     chart.data[1].data = data[10]
     chart.data[2].data = data[3]
@@ -361,7 +382,10 @@ class Runner {
     chart.data[4].data = data[11]
   }
 
-  private updateDebugChartData(chart: TwitterChart, data: any[][]): void {
+  private updateDebugChartData(
+    chart: TwitterChart,
+    data: (Date[] | number[])[]
+  ): void {
     chart.data[0].data = data[0]
     chart.data[1].data = data[6]
     chart.data[2].data = data[7]
@@ -389,7 +413,7 @@ class Runner {
     // Latest outbreak
     const sliceData = this.table.splitAt(6, 1)
     const sliceIndex = sliceData.length
-    const lastSlice = sliceData[sliceIndex - 1]
+    const lastSlice: (Date[] | number[])[] = sliceData[sliceIndex - 1]
     await this.setFolder(`./out/${this.jurisdiction}/${sliceIndex}`)
     await this.makeSliceChart2(sliceIndex, lastSlice)
 

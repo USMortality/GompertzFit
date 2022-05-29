@@ -6,6 +6,14 @@ export interface Row {
   cases: number
 }
 
+type rawDataRow = {
+  state: string,
+  location: string,
+  date: string,
+  cases: string,
+  total_cases: string
+}
+
 export class DataLoader {
   datasetCache: Map<string, Map<string, Row[]>> = new Map()
 
@@ -15,7 +23,7 @@ export class DataLoader {
         resolve(await csvtojson
           .default({ delimiter: ',' })
           .fromFile(filename)
-          .then(async (datas: any) => this.processCsvRows(datas)))
+          .then(async (datas: rawDataRow[]) => this.processCsvRows(datas)))
       } catch (e) {
         console.log('Error loading file, did you run `npm run update`?')
         reject(e)
@@ -30,8 +38,7 @@ export class DataLoader {
     }
     return true
   }
-
-  async processCsvRows(datas: any): Promise<Map<string, Row[]>> {
+  async processCsvRows(datas: rawDataRow[]): Promise<Map<string, Row[]>> {
     const result: Map<string, Row[]> = new Map()
     for await (const data of datas) {
       if (!this.shouldProcess(data)) continue
@@ -41,8 +48,7 @@ export class DataLoader {
 
       const row: Row = {
         date: new Date(data.date),
-        cases: parseInt(data.cases
-          ? data.cases : data.total_cases, 10)
+        cases: parseInt(data.cases ? data.cases : data.total_cases, 10)
       }
 
       const key = getKey(jurisdiction)

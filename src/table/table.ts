@@ -9,11 +9,15 @@ export class Table {
   columnTitles: string[] = []
   private tableRowTypes: TableRowType[] = []
   private dataFunctionDefinitions: BasicFunctionalTableRowType[] = []
-  public data: any[][] = []
+  public data: (Date[] | number[])[] = []
 
   constructor(
     tableRowTypes: TableRowType[]
   ) {
+    const a: (number[] | Date[])[] = []
+    a.push([1, 1])
+    a.push([new Date()])
+
     for (const rowType of tableRowTypes) {
       this.tableRowTypes.push(rowType)
       this.columnTitles.push(rowType.title)
@@ -24,18 +28,28 @@ export class Table {
     }
   }
 
-  insertRow(row: any[], recalculate = true): void {
-    for (let i = 0; i < row.length; i++) this.data[i].push(row[i])
+  insertRow(row: number[] | Date[], recalculate = true): void {
+    for (let i = 0; i < row.length; i++) {
+      if (typeof row[i] === 'number') {
+        const numberRow = row[i] as number
+        const numberArr = this.data[i] as number[]
+        numberArr.push(numberRow)
+      } else if (typeof row[i] === 'object') {
+        const dateRow = row[i] as Date
+        const dateArr = this.data[i] as Date[]
+        dateArr.push(dateRow)
+      }
+    }
     if (recalculate) this.recalculateDataFunctions()
   }
 
-  insertRows(data: any[][]): void {
+  insertRows(data: (Date[] | number[])[]): void {
     assert(data.length === this.staticColumnLength(), 'insertRows')
 
     for (let rowIndex = 0; rowIndex < data[0].length; rowIndex++) {
       const result = []
       for (const colIndex in data) {
-        if (Reflect.apply(Object, data, [colIndex])) {
+        if (Reflect.has(data, colIndex)) {
           const value = data[colIndex][rowIndex]
           if (value !== undefined) result.push(value)
         }
@@ -45,7 +59,7 @@ export class Table {
     this.recalculateDataFunctions()
   }
 
-  getRowAt(rowIndex: number): any[] {
+  getRowAt(rowIndex: number): number[] {
     const result = []
     for (const column of this.data) {
       result.push(column[rowIndex])
@@ -53,8 +67,8 @@ export class Table {
     return result
   }
 
-  splitAt(columnIndex: number, comparator: any): any[][] {
-    const result: any[][] = []
+  splitAt(columnIndex: number, comparator: number): (Date[] | number[])[][] {
+    const result: (Date[] | number[])[][] = []
     let lastRowIndex = 0
 
     for (let i = 0; i < this.data[columnIndex].length; i++) {
@@ -93,8 +107,6 @@ export class Table {
   }
 
   extendColumn(columnIndex: number, extender: number[] | Date[]): void {
-    // console.log(this.data[columnIndex])
-    // Array.prototype.push.apply(this.data[columnIndex], extender)
     Reflect.apply(Array.prototype.push, this.data[columnIndex], extender)
   }
 
@@ -112,7 +124,11 @@ export class Table {
       )
       const data: number | number[] = fun.calculate(this.data)
       if (Array.isArray(data)) this.data[targetColumnIndex] = data
-      else this.data[targetColumnIndex].push(data)
+      else {
+        const arr = this.data[targetColumnIndex] as number[]
+        arr.push(data)
+      }
+
       funIndex++
     }
   }
@@ -121,7 +137,7 @@ export class Table {
     return this.data.length - this.dataFunctionDefinitions.length
   }
 
-  private makeCsvRow(arr: any[]): string {
+  private makeCsvRow(arr: number[] | string[]): string {
     return `"${Object.values(arr).join('","')}"${os.EOL}`
   }
 }

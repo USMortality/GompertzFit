@@ -24,8 +24,8 @@ import { expect } from 'chai'
 import { fillerArray } from '../src/common.js'
 
 const rows = [
-  [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14,],
-  [70, 30, 78, 81, 66, 43, 31, 48, 93, 56, 91, 25, 19, 17,],
+  [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
+  [70, 30, 78, 81, 66, 43, 31, 48, 93, 56, 91, 25, 19, 17],
 ]
 
 describe('table', () => {
@@ -212,7 +212,7 @@ describe('table', () => {
     )
     table.insertRows(rows)
     expect(table.data[2]).to.eql(
-      [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,]
+      [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
     )
     ensureEqualColumnLength(table.data)
   })
@@ -311,20 +311,21 @@ describe('table', () => {
     )
     table.insertRows([
       [
-        '2022-01-01T00:00:00.000Z',
-        '2022-01-02T00:00:00.000Z',
-        '2022-01-03T00:00:00.000Z',
-        '2022-01-04T00:00:00.000Z',
-        '2022-01-05T00:00:00.000Z',
-        '2022-01-06T00:00:00.000Z',
-        '2022-01-07T00:00:00.000Z',
-        '2022-01-08T00:00:00.000Z',
-        '2022-01-09T00:00:00.000Z',
-        '2022-01-10T00:00:00.000Z',
-        '2022-01-11T00:00:00.000Z',
-        '2022-01-12T00:00:00.000Z',
-        '2022-01-13T00:00:00.000Z',
-        '2022-01-14T00:00:00.000Z'],
+        new Date(2022, 1, 1),
+        new Date(2022, 1, 2),
+        new Date(2022, 1, 3),
+        new Date(2022, 1, 4),
+        new Date(2022, 1, 5),
+        new Date(2022, 1, 6),
+        new Date(2022, 1, 7),
+        new Date(2022, 1, 8),
+        new Date(2022, 1, 9),
+        new Date(2022, 1, 10),
+        new Date(2022, 1, 11),
+        new Date(2022, 1, 12),
+        new Date(2022, 1, 13),
+        new Date(2022, 1, 14)
+      ],
       [
         11769282,
         11970948,
@@ -497,6 +498,7 @@ describe('table', () => {
     expect(table.data[5].length).to.equal(20)
   })
 
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   function ensureEqualColumnLength(data: any[]): void {
     for (const row of data) {
       expect(row.length).to.equal(data[0].length)

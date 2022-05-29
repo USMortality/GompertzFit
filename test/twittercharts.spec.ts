@@ -49,9 +49,9 @@ describe('TwitterChart', () => {
         new Date(2020, 1, 11),
         new Date(2020, 1, 12),
         new Date(2020, 1, 13),
-        new Date(2020, 1, 14),
+        new Date(2020, 1, 14)
       ],
-      [70, 30, 78, 81, 66, 43, 31, 48, 93, 56, 91, 25, 19, 17,],
+      [70, 30, 78, 81, 66, 43, 31, 48, 93, 56, 91, 25, 19, 17],
     ]
     table.insertRows(rows)
 
@@ -107,7 +107,7 @@ describe('TwitterChart', () => {
     ])
     const rows = [
       [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
-      [70, 30, 78, 81, 66, 43, 31, 48, 93, 56, 91, 25, 19, 17,],
+      [70, 30, 78, 81, 66, 43, 31, 48, 93, 56, 91, 25, 19, 17],
     ]
     table.insertRows(rows)
     const twitterchart = new TwitterChart(
@@ -149,9 +149,10 @@ describe('TwitterChart', () => {
       {
         axis: TwitterChartSeriesAxisType.x,
         type: TwitterChartSeriesConfigType.label,
-        label: (rowIndex: number): string[] => {
-          return ['Minimum', table.data[0][rowIndex]]
-        },
+        label: (rowIndex: number): string[] => [
+          'Minimum',
+          table.data[0][rowIndex].toString()
+        ],
         color: [0, 0, 255, .5],
         isDashed: true,
         data: table.data[4]
@@ -159,9 +160,10 @@ describe('TwitterChart', () => {
       {
         axis: TwitterChartSeriesAxisType.x,
         type: TwitterChartSeriesConfigType.label,
-        label: (rowIndex: number): string[] => {
-          return ['Maximum', table.data[0][rowIndex]]
-        },
+        label: (rowIndex: number): string[] => [
+          'Maximum',
+          table.data[0][rowIndex].toString()
+        ],
         color: [255, 0, 0, .5],
         isDashed: true,
         data: table.data[5]
@@ -254,12 +256,11 @@ describe('TwitterChart', () => {
       {
         axis: TwitterChartSeriesAxisType.x,
         type: TwitterChartSeriesConfigType.label,
-        label: (rowIndex: number): string[] => {
-          return [
-            'Max',
-            numberWithCommas(table.data[11][rowIndex]),
-            table.data[0][rowIndex]]
-        },
+        label: (rowIndex: number): string[] => [
+          'Max',
+          numberWithCommas(table.data[11][rowIndex] as number),
+          table.data[0][rowIndex].toString()
+        ],
         color: [255, 0, 0, .5],
         isDashed: true,
         data: table.data[12]

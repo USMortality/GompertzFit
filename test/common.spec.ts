@@ -61,9 +61,12 @@ describe('common.ts', () => {
     const dataLoader = new DataLoader()
     it('usa.csv format parsing', async () => {
       const data = await dataLoader.processCsvRows([
-        { date: '2020-03-17', state: 'Florida', cases: '10' },
-        { date: '2020-03-18', state: 'Florida', cases: '15' },
-        { date: '2020-03-17', state: 'Texas', cases: '25' }
+        /* eslint-disable-next-line camelcase */
+        { date: '2020-03-17', state: 'Florida', cases: '10', location: undefined, total_cases: undefined },
+        /* eslint-disable-next-line camelcase */
+        { date: '2020-03-18', state: 'Florida', cases: '15', location: undefined, total_cases: undefined },
+        /* eslint-disable-next-line camelcase */
+        { date: '2020-03-17', state: 'Texas', cases: '25', location: undefined, total_cases: undefined }
       ])
       const flData: Row[] = data.get('florida')
       expect(flData.length).to.equal(2)
@@ -76,17 +79,26 @@ describe('common.ts', () => {
         {
           date: '2020-03-17',
           location: 'Germany',
-          total_cases: '10'
+          /* eslint-disable-next-line camelcase */
+          total_cases: '10',
+          state: undefined,
+          cases: undefined
         },
         {
           date: '2020-03-18',
           location: 'Germany',
-          total_cases: '15'
+          /* eslint-disable-next-line camelcase */
+          total_cases: '15',
+          state: undefined,
+          cases: undefined
         },
         {
           date: '2020-03-17',
           location: 'France',
-          total_cases: '25'
+          /* eslint-disable-next-line camelcase */
+          total_cases: '25',
+          state: undefined,
+          cases: undefined
         }
       ])
       const flData: Row[] = data.get('germany')
