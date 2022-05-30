@@ -89,7 +89,7 @@ export class TwitterChart {
             line.label.enabled = true
             line.borderDash = data.isDashed ? [4, 6] : [0, 0]
             line.label.content = this.getLineLabel(data.label, i)
-            labels.push(JSON.parse(JSON.stringify(line)))
+            labels.push(JSON.parse(JSON.stringify(line)) as object)
           }
         }
       }
@@ -129,13 +129,14 @@ export class TwitterChart {
     const configuration: ChartConfiguration = {
       type: 'line',
       data: {
-        /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+        /* eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment */
         datasets: this.makeDataSet() as any,
         labels: this.data[this.labelIndex].data
       },
       options: {
         responsive: true,
         devicePixelRatio: 2,
+        /* eslint-disable-next-line @typescript-eslint/no-unsafe-assignment */
         plugins: {
           annotation: {
             annotations: this.makeLabels()
@@ -194,9 +195,9 @@ export class TwitterChart {
               callback: (_value, index) => {
                 const item = this.data[this.labelIndex].data[index]
                 if (item instanceof Date) {
-                  const d = item as Date
-                  if (d.getDate() === 1) {
-                    return `${d.getMonth() + 1}/${d.getFullYear().toString()}`
+                  if (item.getDate() === 1) {
+                    return `${item.getMonth() + 1}/`
+                      + `${item.getFullYear().toString()}`
                   }
                   return null
                 } else return item
