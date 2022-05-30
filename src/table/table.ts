@@ -48,11 +48,9 @@ export class Table {
 
     for (let rowIndex = 0; rowIndex < data[0].length; rowIndex++) {
       const result = []
-      for (const colIndex in data) {
-        if (Reflect.has(data, colIndex)) {
-          const value = data[colIndex][rowIndex]
-          if (value !== undefined) result.push(value)
-        }
+      for (const column of data) {
+        const value = column[rowIndex]
+        if (value !== undefined) result.push(value)
       }
       this.insertRow(result, false)
     }
@@ -60,9 +58,9 @@ export class Table {
   }
 
   getRowAt(rowIndex: number): number[] {
-    const result = []
+    const result: number[] = []
     for (const column of this.data) {
-      result.push(column[rowIndex])
+      result.push(column[rowIndex] as number)
     }
     return result
   }
@@ -72,7 +70,7 @@ export class Table {
     let lastRowIndex = 0
 
     for (let i = 0; i < this.data[columnIndex].length; i++) {
-      const subTableResult = []
+      const subTableResult: (number[] | Date[])[] = []
       if (this.data[columnIndex][i] === comparator
         || this.data[columnIndex].length - 1 === i) {
         for (const column of this.data) {
@@ -107,7 +105,18 @@ export class Table {
   }
 
   extendColumn(columnIndex: number, extender: number[] | Date[]): void {
-    Reflect.apply(Array.prototype.push, this.data[columnIndex], extender)
+    const column = this.data[columnIndex]
+    if (column.length === 0) {
+      this.data[columnIndex] = extender
+    } else if (typeof column[0] === 'number' && typeof extender[0] === 'number') {
+      const columnTyped = column as number[]
+      this.data[columnIndex] = columnTyped.concat(extender as number[])
+    } else if (column[0] instanceof Date && extender[0] instanceof Date) {
+      const columnTyped = column as Date[]
+      this.data[columnIndex] = columnTyped.concat(extender as Date[])
+    } else {
+      throw new Error('Trying to merge two columns with different types.')
+    }
   }
 
   reduceColumn(columnIndex: number, length: number): void {

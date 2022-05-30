@@ -129,7 +129,7 @@ class Runner {
 
     let rowIndex = 0
     for (const row of this.data.get(this.jurisdiction)) {
-      console.log(`Processing ${row.date}`)
+      console.log(`Processing ${row.date.toString()}`)
 
       this.table.extendColumn(0,
         fillerDateArray(row.date, this.extraDays)
@@ -208,7 +208,7 @@ class Runner {
       slice[4]
     ]
     for (let i = 0; i < data[1].length; i++) {
-      console.log(`Processing ${data[0][i]}`)
+      console.log(`Processing ${data[0][i].toString()}`)
       sliceTable.insertRow([data[0][i], data[1][i]] as (Date[] | number[]))
       sliceTable.extendColumn(0,
         fillerDateArray(data[0][i] as Date, this.extraDays)
@@ -230,13 +230,13 @@ class Runner {
       new StaticTableRowType('Date'), // 0
       new StaticTableRowType('Cases (7d AVG)'), // 1
       new AutoIncrementTableRowType('x', this.extraDays), // 2
-      new LoessTableRowType('Cases (7d AVG, Loess)', 1, 2), // 3
+      new LoessTableRowType('Cases (7d AVG, Loess)', 1, 2, .2), // 3
       new ArithmeticTableRowType('Cases (7d AVG, Loess) - Background',
         3, ArithmeticFunction.SUB, 3, 0), // 4
       new SumTableRowType('Reconstitute Total, X(t)', 4), // 5
       new GompertzJtS1TableRowType('log[Exp. Grow. Factor]', 5), // 6
       new GompertzJtS2TableRowType('log[Exp. Grow. Factor] 14d Trend',
-        6, 2, 7), // 7
+        6, 2, 14), // 7
       new GompertzJtS3TableRowType('Prediction Total', 5, 2, 7), // 8
       new DiffTableRowType('Cases Prediction - Background', 8), // 9
       new ArithmeticTableRowType('Cases Prediction', 9,
@@ -349,7 +349,7 @@ class Runner {
       slice[4]
     ]
     for (let i = 0; i < data[1].length; i++) {
-      console.log(`Processing ${data[0][i]}`)
+      console.log(`Processing ${data[0][i].toString()}`)
       sliceTable.insertRow([data[0][i], data[1][i]] as (number[] | Date[]))
 
       const extraDates = fillerDateArray(data[0][i] as Date, this.extraDays)
@@ -408,7 +408,7 @@ class Runner {
 
     await this.setFolder(`./out/${this.jurisdiction}/0`)
     await this.makeOverviewChart()
-    await this.makeMovie(0, 30, '1200x670')
+    this.makeMovie(0, 30, '1200x670')
 
     // Latest outbreak
     const sliceData = this.table.splitAt(6, 1)
@@ -417,12 +417,12 @@ class Runner {
     await this.setFolder(`./out/${this.jurisdiction}/${sliceIndex}`)
     await this.makeSliceChart2(sliceIndex, lastSlice)
 
-    await this.makeMovie(sliceIndex, 5, '1200x600')
+    this.makeMovie(sliceIndex, 5, '1200x600')
 
     console.log('Processing data finished.')
   }
 
-  private async setFolder(folder): Promise<void> {
+  private async setFolder(folder: string): Promise<void> {
     execSync(`rm -rf ${folder}`)
     this.folder = folder
     return await ensureDir(folder)
@@ -435,4 +435,4 @@ class Runner {
 }
 
 const runner = new Runner()
-runner.run()
+await runner.run()

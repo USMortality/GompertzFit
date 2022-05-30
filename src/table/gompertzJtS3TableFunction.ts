@@ -23,7 +23,7 @@ export class GompertzJtS3TableFunction extends BasicTableFunction {
     // const xData = this.makeXRow(columnData.length)
 
     // Fill in actual values first
-    const result = JSON.parse(JSON.stringify(columnData))
+    const result = JSON.parse(JSON.stringify(columnData)) as number[]
 
     // Calculate Prediction Total
     for (let i = result.length - 1; i < xData.length - 1; i++) {

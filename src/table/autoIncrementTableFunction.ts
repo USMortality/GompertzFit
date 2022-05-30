@@ -9,7 +9,7 @@ export class AutoIncrementTableFunction extends BasicTableFunction {
   }
 
   override calculate(data: number[][]): number[] {
-    const result = []
+    const result: number[] = []
     const limit = this.sourceColumn(data).length + this.extraRows
     for (let i = 0; i < limit; i++) result.push(i + 1)
     return result

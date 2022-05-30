@@ -62,13 +62,17 @@ export class AvgNTableRowType extends FunctionalTableRowType {
 // eslint-disable-next-line max-classes-per-file
 export class LoessTableRowType extends FunctionalTableRowType {
   xColumnIndex: number
+  smoothFactor: number
+
   constructor(
     title: string,
     sourceColumnIndex: number,
-    xColumnIndex: number
+    xColumnIndex: number,
+    smoothFactor: number
   ) {
     super(title, sourceColumnIndex)
     this.xColumnIndex = xColumnIndex
+    this.smoothFactor = smoothFactor
   }
 }
 

@@ -19,7 +19,7 @@ export class GompertzJtS2TableFunction extends BasicTableFunction {
   override calculate(data: number[][]): number[] {
     const columnData = this.sourceColumn(data)
     const xData = this.makeXRow(columnData.length)
-    const result = []
+    const result: number[] = []
 
     // Calculate log[Exp. Grow. Factor] Trend Line
     const regression = new SimpleLinearRegression(
@@ -37,7 +37,7 @@ export class GompertzJtS2TableFunction extends BasicTableFunction {
   }
 
   private makeXRow(len: number): number[] {
-    const result = []
+    const result: number[] = []
     for (let i = 0; i < len; i++) result.push(i)
     return result
   }

@@ -5,7 +5,7 @@ export class GompertzJtS1TableFunction extends BasicTableFunction {
   override calculate(data: number[][]): number[] {
     const columnData = this.sourceColumn(data)
 
-    const growthFactors = []
+    const growthFactors: number[] = []
     // Calculate log[Exp. Grow. Factor]
     for (let i = 0; i < columnData.length; i++) {
       // Calculate factor

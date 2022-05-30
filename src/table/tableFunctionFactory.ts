@@ -60,7 +60,8 @@ export class TableFunctionFactory {
         return new LoessTableFunction(
           columnIndex,
           loessTableRowType.sourceColumnIndex,
-          loessTableRowType.xColumnIndex
+          loessTableRowType.xColumnIndex,
+          loessTableRowType.smoothFactor
         )
       case GaussTableRowType:
         const gaussTableRowType

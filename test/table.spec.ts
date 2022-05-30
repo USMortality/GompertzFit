@@ -21,7 +21,7 @@ import {
 } from '../src/table/tableRowType.js'
 import { Table } from '../src/table/table.js'
 import { expect } from 'chai'
-import { fillerArray } from '../src/common.js'
+import { fillerArray, fillerDateArray } from '../src/common.js'
 
 const rows = [
   [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
@@ -120,7 +120,7 @@ describe('table', () => {
         new StaticTableRowType('t'),
         new StaticTableRowType('Cases'),
         new AvgNTableRowType('Cases 7d Avg', 1, 7),
-        new LoessTableRowType('Cases 7day Avg (Smooth)', 2, 0)
+        new LoessTableRowType('Cases 7day Avg (Smooth)', 2, 0, 2 / 3)
       ]
     )
     table.insertRows(rows)
@@ -306,7 +306,7 @@ describe('table', () => {
         new AutoIncrementTableRowType('t'),
         new DiffTableRowType('Daily Cases', 1),
         new AvgNTableRowType('Cases (7d AVG)', 3, 7),
-        new LoessTableRowType('Cases (7d AVG, smooth)', 4, 2)
+        new LoessTableRowType('Cases (7d AVG, smooth)', 4, 2, 2 / 3)
       ]
     )
     table.insertRows([
@@ -385,15 +385,15 @@ describe('table', () => {
   it('extendColumn', () => {
     const table = new Table(
       [
-        new StaticTableRowType('t'),
+        new StaticTableRowType('date'),
         new StaticTableRowType('Cases'),
       ]
     )
-    table.insertRows(rows)
-    const extender = fillerArray(10)
+    table.insertRows([[new Date()], [1]])
+    const extender = fillerDateArray(new Date(), 2)
     table.extendColumn(0, extender)
-    expect(table.data[0].length).to.equal(24)
-    expect(table.data[1].length).to.equal(14)
+    expect(table.data[0].length).to.equal(3)
+    expect(table.data[1].length).to.equal(1)
   })
 
   it('reduceColumn', () => {
@@ -498,8 +498,7 @@ describe('table', () => {
     expect(table.data[5].length).to.equal(20)
   })
 
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  function ensureEqualColumnLength(data: any[]): void {
+  function ensureEqualColumnLength(data: (Date[] | number[])[]): void {
     for (const row of data) {
       expect(row.length).to.equal(data[0].length)
     }

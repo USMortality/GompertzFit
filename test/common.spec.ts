@@ -61,12 +61,41 @@ describe('common.ts', () => {
     const dataLoader = new DataLoader()
     it('usa.csv format parsing', async () => {
       const data = await dataLoader.processCsvRows([
+        {
+          date: '2020-03-17',
+          state: 'Florida',
+          cases: '10',
+          location: undefined,
+          /* eslint-disable-next-line camelcase */
+          total_cases: undefined,
+          /* eslint-disable-next-line camelcase */
+          iso_code: undefined,
+          population: undefined
+        },
         /* eslint-disable-next-line camelcase */
-        { date: '2020-03-17', state: 'Florida', cases: '10', location: undefined, total_cases: undefined },
+        {
+          date: '2020-03-18',
+          state: 'Florida',
+          cases: '15',
+          location: undefined,
+          /* eslint-disable-next-line camelcase */
+          total_cases: undefined,
+          /* eslint-disable-next-line camelcase */
+          iso_code: undefined,
+          population: undefined
+        },
         /* eslint-disable-next-line camelcase */
-        { date: '2020-03-18', state: 'Florida', cases: '15', location: undefined, total_cases: undefined },
-        /* eslint-disable-next-line camelcase */
-        { date: '2020-03-17', state: 'Texas', cases: '25', location: undefined, total_cases: undefined }
+        {
+          date: '2020-03-17',
+          state: 'Texas',
+          cases: '25',
+          location: undefined,
+          /* eslint-disable-next-line camelcase */
+          total_cases: undefined,
+          /* eslint-disable-next-line camelcase */
+          iso_code: undefined,
+          population: undefined
+        }
       ])
       const flData: Row[] = data.get('florida')
       expect(flData.length).to.equal(2)
@@ -81,6 +110,9 @@ describe('common.ts', () => {
           location: 'Germany',
           /* eslint-disable-next-line camelcase */
           total_cases: '10',
+          /* eslint-disable-next-line camelcase */
+          iso_code: undefined,
+          population: undefined,
           state: undefined,
           cases: undefined
         },
@@ -89,6 +121,9 @@ describe('common.ts', () => {
           location: 'Germany',
           /* eslint-disable-next-line camelcase */
           total_cases: '15',
+          /* eslint-disable-next-line camelcase */
+          iso_code: undefined,
+          population: undefined,
           state: undefined,
           cases: undefined
         },
@@ -97,6 +132,9 @@ describe('common.ts', () => {
           location: 'France',
           /* eslint-disable-next-line camelcase */
           total_cases: '25',
+          /* eslint-disable-next-line camelcase */
+          iso_code: undefined,
+          population: undefined,
           state: undefined,
           cases: undefined
         }

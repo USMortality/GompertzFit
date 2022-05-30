@@ -3,7 +3,7 @@ import { pipeline } from 'stream'
 import fetch from 'node-fetch'
 
 export function fillerArray(end: number, filler: number = undefined): number[] {
-  const result = []
+  const result: number[] = []
   for (let i = 0; i < end; i++) result.push(filler)
   return result
 }
@@ -12,13 +12,13 @@ export function fillerAutoIncrementArray(
   end: number,
   filler = 0
 ): number[] {
-  const result = []
+  const result: number[] = []
   for (let i = 0; i < end; i++) result.push(filler++)
   return result
 }
 
 export function fillerDateArray(fromDate: Date, end: number): Date[] {
-  const result = []
+  const result: Date[] = []
   const start = fromDate
   for (let i = 0; i < end; i++) result.push(addDays(start, i + 1))
   return result
@@ -58,7 +58,7 @@ export async function loadJson(filename: string): Promise<object> {
     readFile(filename, { encoding: 'utf-8' }, (err, data) => {
       if (err || !data) reject(err)
       try {
-        resolve(JSON.parse(data))
+        resolve(JSON.parse(data) as object)
       } catch (e) {
         reject(e)
       }
@@ -87,7 +87,7 @@ export function dateString(date: Date): string {
   return date.toLocaleDateString('en-US', { timeZone: 'UTC' })
 }
 
-export function zeroPad(num, places): string {
+export function zeroPad(num: number, places: number): string {
   return String(num).padStart(places, '0')
 }
 

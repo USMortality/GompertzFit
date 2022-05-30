@@ -179,7 +179,7 @@ describe('TwitterChart', () => {
       new StaticTableRowType('t'), // 0
       new StaticTableRowType('Cases'), // 1
       new AvgNTableRowType('Cases (7d AVG)', 1, 7), // 2
-      new LoessTableRowType('Cases (7d AVG, Loess)', 2, 0), // 3
+      new LoessTableRowType('Cases (7d AVG, Loess)', 2, 0, 2 / 3), // 3
       new ArithmeticTableRowType('Cases (7d AVG) - Background',
         3, ArithmeticFunction.SUB, 3, 0), // 4
       new SumTableRowType('Reconstitute Total, X(t)', 4), // 5

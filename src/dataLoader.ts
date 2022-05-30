@@ -11,27 +11,22 @@ type rawDataRow = {
   location: string,
   date: string,
   cases: string,
-  total_cases: string
+  total_cases: string,
+  iso_code: string,
+  population: string
 }
 
 export class DataLoader {
   datasetCache: Map<string, Map<string, Row[]>> = new Map()
 
   async loadData(filename: string): Promise<Map<string, Row[]>> {
-    return new Promise(async (resolve, reject) => {
-      try {
-        resolve(await csvtojson
-          .default({ delimiter: ',' })
-          .fromFile(filename)
-          .then(async (datas: rawDataRow[]) => this.processCsvRows(datas)))
-      } catch (e) {
-        console.log('Error loading file, did you run `npm run update`?')
-        reject(e)
-      }
-    })
+    return csvtojson
+      .default({ delimiter: ',' })
+      .fromFile(filename)
+      .then(async (datas: rawDataRow[]) => this.processCsvRows(datas))
   }
 
-  shouldProcess(data): boolean {
+  shouldProcess(data: rawDataRow): boolean {
     if (data.iso_code) { // world dataset
       if (data.iso_code.startsWith('OWID')) return false
       if (parseInt(data.population, 10) < 1000000) return false

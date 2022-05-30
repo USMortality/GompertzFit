@@ -22,7 +22,7 @@ export class ArithmeticTableFunction extends BasicTableFunction {
 
   override calculate(data: number[][]): number[] {
     const term = data[this.termColumnIndex][this.termRowIndex]
-    const result = []
+    const result: number[] = []
 
     for (let i = 0; i < this.sourceColumn(data).length; i++) {
       const cell = data[this.sourceColumnIndex][i]
