@@ -20,7 +20,6 @@ import {
   GompertzJtS1TableRowType,
   GompertzJtS2TableRowType,
   GompertzJtS3TableRowType,
-  LoessTableRowType,
 } from './table/tableRowType.js'
 import {
   dateString,
@@ -45,7 +44,7 @@ class Runner {
       new AutoIncrementTableRowType('Day'), // 2
       new DiffTableRowType('Daily Cases', 1), // 3
       new AvgNTableRowType('Cases (7d AVG)', 3, 7), // 4
-      new GaussTableRowType('Cases (7d AVG, smooth)', 4, 100), // 5
+      new GaussTableRowType('Cases (7d AVG, smooth 100x)', 4, 100), // 5
       new LocalExtremaTableRowType('Min', 5, LocalExtramaType.MIN), // 6
       new LocalExtremaTableRowType('Max', 5, LocalExtramaType.MAX) // 7
     ]
@@ -162,7 +161,7 @@ class Runner {
     const sliceTable: Table = new Table([
       new StaticTableRowType('Date'), // 0
       new StaticTableRowType('Cases (7d AVG)'), // 1
-      new GaussTableRowType('Cases (7d AVG, smooth)', 1, 100), // 2
+      new GaussTableRowType('Cases (7d AVG, smooth 100x)', 1, 100), // 2
       new AutoIncrementTableRowType('Day', this.extraDays), // 3
       new ArithmeticTableRowType('Cases (7d AVG) - Background',
         2, ArithmeticFunction.SUB, 2, 0), // 4
@@ -236,8 +235,8 @@ class Runner {
       new StaticTableRowType('Date'), // 0
       new StaticTableRowType('Cases (7d AVG)'), // 1
       new AutoIncrementTableRowType('x', this.extraDays), // 2
-      new LoessTableRowType('Cases (7d AVG, Loess)', 1, 2, .2), // 3
-      new ArithmeticTableRowType('Cases (7d AVG, Loess) - Background',
+      new GaussTableRowType('Cases (7d AVG, Smooth 10x)', 1, 2), // 3
+      new ArithmeticTableRowType('Cases (7d AVG, Smooth 1x) - Background',
         3, ArithmeticFunction.SUB, 3, 0), // 4
       new SumTableRowType('Reconstitute Total, X(t)', 4), // 5
       new GompertzJtS1TableRowType('log[Exp. Grow. Factor]', 5), // 6
