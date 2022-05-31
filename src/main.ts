@@ -31,9 +31,10 @@ import {
 } from './common.js'
 import { ArithmeticFunction } from './table/arithmeticTableFunction.js'
 import { ensureDir } from 'fs-extra'
+import { program } from 'commander'
 
 class Runner {
-  jurisdiction = 'germany'
+  jurisdiction: string
   data: Map<string, Row[]>
   extraDays = 120
   folder = 'test'
@@ -433,9 +434,26 @@ class Runner {
     return await ensureDir(folder)
   }
 
+  optionsValid() {
+    if (!this.jurisdiction) {
+      console.error('Please define --jurisdiction')
+      return false
+    }
+    return true
+  }
+
   async run(): Promise<void> {
-    await this.loadData()
-    await this.processData()
+    program
+      .option('-j, --jurisdiction <type>', 'jurisdiction e.g.: `united_states` `germany`')
+    program.parse(process.argv)
+
+    const options = program.opts()
+    this.jurisdiction = options.jurisdiction as string
+
+    if (this.optionsValid()) {
+      await this.loadData()
+      await this.processData()
+    }
   }
 }
 
