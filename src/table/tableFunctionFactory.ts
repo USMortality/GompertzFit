@@ -32,8 +32,8 @@ import { GompertzJtS1TableFunction } from './gompertzJtS1TableFunction.js'
 import { GompertzJtS2TableFunction } from './gompertzJtS2TableFunction.js'
 import { GompertzJtS3TableFunction } from './gompertzJtS3TableFunction.js'
 
-export class TableFunctionFactory {
-  static getFunction(
+export const TableFunctionFactory = {
+  getFunction(
     columnIndex: number,
     basicFunctionalTableRowType: BasicFunctionalTableRowType
   ): TableFunction {

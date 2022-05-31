@@ -20,9 +20,10 @@ export class GompertzTableFunction extends BasicTableFunction {
   override calculate(data: number[][]): number[] {
     const result: number[] = []
     // console.log(data[this.sourceColumnIndex])
-    const config: GompertzParams = solve(
+    const config: GompertzParams | undefined = solve(
       data[this.sourceColumnIndex], gompertzDerivative
     )
+    if (!config) throw new Error('No gompertz params found!')
 
     for (const cell of data[this.tColumnIndex]) {
       result.push(gompertzDerivative(cell, config.a, config.b, config.c))

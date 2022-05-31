@@ -1,5 +1,7 @@
+import { DataType } from './table'
+
 export interface TableFunction {
-  calculate(data: (Date[] | number[])[]): number | number[]
+  calculate(data: DataType[]): number | number[]
 }
 
 export abstract class BasicTableFunction implements TableFunction {

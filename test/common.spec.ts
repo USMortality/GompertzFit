@@ -9,11 +9,11 @@ import {
 
 describe('common.ts', () => {
   describe('fillerArray', () => {
-    it('fillerArray returns array of 2x undefinded', () => {
-      const result = fillerArray(2)
+    it('fillerArray returns array of 2x `0`', () => {
+      const result = fillerArray(2, 0)
       expect(result.length).to.equal(2)
-      expect(result[0]).to.equal(undefined)
-      expect(result[1]).to.equal(undefined)
+      expect(result[0]).to.equal(0)
+      expect(result[1]).to.equal(0)
     })
     it('fillerArray return array of 2x number', () => {
       const result = fillerArray(2, 10)
@@ -97,11 +97,12 @@ describe('common.ts', () => {
           population: undefined
         }
       ])
-      const flData: Row[] = data.get('florida')
-      expect(flData.length).to.equal(2)
-      deepEqual(flData[0].date, new Date('2020-03-17'))
-      deepEqual(flData[1].date, new Date('2020-03-18'))
-      expect(flData[0].cases).to.equal(10)
+      const locationData: Row[] | undefined = data.get('florida')
+      if (!locationData) throw new Error('No data found for florida!')
+      expect(locationData.length).to.equal(2)
+      deepEqual(locationData[0].date, new Date('2020-03-17'))
+      deepEqual(locationData[1].date, new Date('2020-03-18'))
+      expect(locationData[0].cases).to.equal(10)
     })
     it('world.csv format parsing', async () => {
       const data = await dataLoader.processCsvRows([
@@ -139,11 +140,12 @@ describe('common.ts', () => {
           cases: undefined
         }
       ])
-      const flData: Row[] = data.get('germany')
-      expect(flData.length).to.equal(2)
-      deepEqual(flData[0].date, new Date('2020-03-17'))
-      deepEqual(flData[1].date, new Date('2020-03-18'))
-      expect(flData[0].cases).to.equal(10)
+      const locationData: Row[] | undefined = data.get('germany')
+      if (!locationData) throw new Error('No data found for germany!')
+      expect(locationData.length).to.equal(2)
+      deepEqual(locationData[0].date, new Date('2020-03-17'))
+      deepEqual(locationData[1].date, new Date('2020-03-18'))
+      expect(locationData[0].cases).to.equal(10)
     })
   })
   describe('capitalizeFirstLetters', () => {

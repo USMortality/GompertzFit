@@ -1,8 +1,7 @@
 import { readFile, writeFile, createWriteStream } from 'fs'
-import { pipeline } from 'stream'
 import fetch from 'node-fetch'
 
-export function fillerArray(end: number, filler: number = undefined): number[] {
+export function fillerArray(end: number, filler: number): number[] {
   const result: number[] = []
   for (let i = 0; i < end; i++) result.push(filler)
   return result
@@ -41,10 +40,10 @@ export function addDays(date: Date, days: number): Date {
 
 export async function saveImage(image: Buffer, filename: string):
   Promise<void> {
-  return new Promise(resolve => {
+  return new Promise(res => {
     writeFile(filename, image, 'base64', err => {
       if (err) console.error(err)
-      resolve()
+      res()
     })
   })
 }
@@ -54,11 +53,11 @@ export function getNumberLength(val: number): number {
 }
 
 export async function loadJson(filename: string): Promise<object> {
-  return new Promise((resolve, reject) => {
+  return new Promise((res, reject) => {
     readFile(filename, { encoding: 'utf-8' }, (err, data) => {
       if (err || !data) reject(err)
       try {
-        resolve(JSON.parse(data) as object)
+        res(JSON.parse(data) as object)
       } catch (e) {
         reject(e)
       }
@@ -72,15 +71,13 @@ export function capitalizeFirstLetters(str: string): string {
 
 export async function download(urlString: string, file: string): Promise<void> {
   const response = await fetch(urlString)
-  if (!response.ok) {
-    throw new Error(`unexpected response ${response.statusText}`)
+  if (!response.body || !response.ok) {
+    throw new Error(
+      `Error making request: ${JSON.stringify(response, null, 2)}`
+    )
   }
-  return new Promise(resolve => {
-    pipeline(response.body, createWriteStream(file), err => {
-      if (err) console.error(err)
-      resolve()
-    })
-  })
+  const stream = createWriteStream(file)
+  response.body.on('data', chunk => stream.write(chunk))
 }
 
 export function dateString(date: Date): string {

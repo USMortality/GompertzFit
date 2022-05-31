@@ -19,9 +19,9 @@ import {
   SumNTableRowType,
   SumTableRowType
 } from '../src/table/tableRowType.js'
-import { Table } from '../src/table/table.js'
+import { DataType, Table } from '../src/table/table.js'
 import { expect } from 'chai'
-import { fillerArray, fillerDateArray } from '../src/common.js'
+import { fillerDateArray } from '../src/common.js'
 
 const rows = [
   [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
@@ -498,7 +498,7 @@ describe('table', () => {
     expect(table.data[5].length).to.equal(20)
   })
 
-  function ensureEqualColumnLength(data: (Date[] | number[])[]): void {
+  function ensureEqualColumnLength(data: DataType[]): void {
     for (const row of data) {
       expect(row.length).to.equal(data[0].length)
     }

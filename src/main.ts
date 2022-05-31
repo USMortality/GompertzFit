@@ -6,7 +6,7 @@ import {
   TwitterChartSeriesConfigType
 } from './twitterChart.js'
 import { DataLoader, Row } from './dataLoader.js'
-import { Table } from './table/table.js'
+import { DataType, Table } from './table/table.js'
 import {
   AutoIncrementTableRowType,
   AvgNTableRowType,
@@ -33,7 +33,7 @@ import { ArithmeticFunction } from './table/arithmeticTableFunction.js'
 import { ensureDir } from 'fs-extra'
 
 class Runner {
-  jurisdiction = 'united_states'
+  jurisdiction = 'germany'
   data: Map<string, Row[]>
   extraDays = 120
   folder = 'test'
@@ -59,7 +59,7 @@ class Runner {
 
   private updateChartData(
     chart: TwitterChart,
-    data: (Date[] | number[])[]
+    data: DataType[]
   ): void {
     chart.data[0].data = data[0]
     chart.data[1].data = data[5]
@@ -128,17 +128,22 @@ class Runner {
     ]
 
     let rowIndex = 0
-    for (const row of this.data.get(this.jurisdiction)) {
-      console.log(`Processing ${row.date.toString()}`)
+    const rows = this.data.get(this.jurisdiction)
+    if (rows) {
+      for (const row of rows) {
+        console.log(`Processing ${row.date.toString()}`)
 
-      this.table.extendColumn(0,
-        fillerDateArray(row.date, this.extraDays)
-      )
-      this.table.insertRow([row.date, row.cases] as Date[] | number[])
-      this.updateChartData(chart, this.table.data)
-      const lastT = zeroPad(rowIndex++, 3)
-      await chart.save(`${this.folder}/${lastT}.png`)
-      this.table.reduceColumn(0, this.extraDays)
+        this.table.extendColumn(0,
+          fillerDateArray(row.date, this.extraDays)
+        )
+        this.table.insertRow([row.date, row.cases] as DataType)
+        this.updateChartData(chart, this.table.data)
+        const lastT = zeroPad(rowIndex++, 3)
+        await chart.save(`${this.folder}/${lastT}.png`)
+        this.table.reduceColumn(0, this.extraDays)
+      }
+    } else {
+      throw new Error(`No data for ${this.jurisdiction}`)
     }
   }
 
@@ -149,7 +154,7 @@ class Runner {
 
   async makeSliceChart(
     sliceIndex: number,
-    slice: (Date[] | number[])[]
+    slice: DataType[]
   ): Promise<void> {
     console.log('Making slice chart')
 
@@ -209,7 +214,7 @@ class Runner {
     ]
     for (let i = 0; i < data[1].length; i++) {
       console.log(`Processing ${data[0][i].toString()}`)
-      sliceTable.insertRow([data[0][i], data[1][i]] as (Date[] | number[]))
+      sliceTable.insertRow([data[0][i], data[1][i]] as DataType)
       sliceTable.extendColumn(0,
         fillerDateArray(data[0][i] as Date, this.extraDays)
       )
@@ -223,7 +228,7 @@ class Runner {
     }
   }
 
-  async makeSliceChart2(sliceIndex: number, slice: (Date[] | number[])[]): Promise<void> {
+  async makeSliceChart2(sliceIndex: number, slice: DataType[]): Promise<void> {
     console.log('Making slice chart')
 
     const sliceTable: Table = new Table([
@@ -373,7 +378,7 @@ class Runner {
 
   private updateSliceChartData(
     chart: TwitterChart,
-    data: (Date[] | number[])[]
+    data: DataType[]
   ): void {
     chart.data[0].data = data[0]
     chart.data[1].data = data[10]
@@ -384,7 +389,7 @@ class Runner {
 
   private updateDebugChartData(
     chart: TwitterChart,
-    data: (Date[] | number[])[]
+    data: DataType[]
   ): void {
     chart.data[0].data = data[0]
     chart.data[1].data = data[6]
@@ -413,7 +418,7 @@ class Runner {
     // Latest outbreak
     const sliceData = this.table.splitAt(6, 1)
     const sliceIndex = sliceData.length
-    const lastSlice: (Date[] | number[])[] = sliceData[sliceIndex - 1]
+    const lastSlice: DataType[] = sliceData[sliceIndex - 1]
     await this.setFolder(`./out/${this.jurisdiction}/${sliceIndex}`)
     await this.makeSliceChart2(sliceIndex, lastSlice)
 

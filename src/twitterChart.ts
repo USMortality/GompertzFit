@@ -1,3 +1,4 @@
+import { DataType } from './table/table'
 import { ChartConfiguration } from 'chart.js'
 import { ChartJSNodeCanvas } from 'chartjs-node-canvas'
 import { promisify } from 'node:util'
@@ -11,9 +12,28 @@ export interface TwitterChartSeries {
   label: string | ((rowIndex: number) => string[]),
   color: number[],
   isDashed: boolean,
-  data?: number[] | Date[]
+  data?: DataType
 }
-const line = {
+
+interface Line {
+  type: string,
+  xMin: number,
+  xMax: number,
+  borderColor: string,
+  borderWidth: number,
+  borderDash: number[],
+  label: {
+    rotation: boolean,
+    position: string,
+    content: string[],
+    font: {
+      size: number
+    },
+    enabled: boolean
+  }
+}
+
+const line: Line = {
   type: 'line',
   xMin: 60,
   xMax: 60,
@@ -80,8 +100,11 @@ export class TwitterChart {
     for (const data of this.data) {
       if (data.axis === TwitterChartSeriesAxisType.x
         && data.type === TwitterChartSeriesConfigType.label) {
-        for (let i = 0; i < data.data.length; i++) {
-          const row = data.data[i]
+        const datas = data.data
+        if (!datas) throw new Error('asdf')
+
+        for (let i = 0; i < datas.length; i++) {
+          const row = datas[i]
           if (row > 0) {
             line.xMin = i
             line.xMax = i
@@ -193,7 +216,9 @@ export class TwitterChart {
               },
               color: 'rgba(0, 0, 0, 100%)',
               callback: (_value, index) => {
-                const item = this.data[this.labelIndex].data[index]
+                const labelData = this.data[this.labelIndex]
+                if (!labelData.data) throw new Error('No data found for label.')
+                const item = labelData.data[index]
                 if (item instanceof Date) {
                   if (item.getDate() === 1) {
                     return `${item.getMonth() + 1}/`
