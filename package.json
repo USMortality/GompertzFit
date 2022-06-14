@@ -11,7 +11,7 @@
     "build": "npm run clean && npx tsc",
     "update": "node dist/src/download.js",
     "clean": "rm -rf ./dist/* && rm -rf ./out/*",
-    "start": "node dist/src/main.js",
+    "start": "npm run build && npm run update && node dist/src/main.js",
     "watch": "npx tsc -w",
     "test": "npx mocha",
     "testDebug": "env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\" }' ./node_modules/.bin/mocha --require ts-node/register --project tsconfig.testing.json --inspect-brk --enable-source-maps 'tests/**/*.test.ts'",
