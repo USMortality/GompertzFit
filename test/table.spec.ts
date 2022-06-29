@@ -158,7 +158,7 @@ describe('table', () => {
     table.insertRows(rows)
 
     expect(table.data[2][11]).to.equal(55.285714285714285)
-    expect(table.data[3][11]).to.equal(55.37773153875936)
+    expect(table.data[3][11]).to.equal(55.37773153875938)
     ensureEqualColumnLength(table.data)
   })
 
